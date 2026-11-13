@@ -175,6 +175,14 @@ section { padding-block: 48px; }
 .buy { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: auto; padding-top: 14px; }
 .price { font-size: 22px; font-weight: 800; font-variant-numeric: tabular-nums; }
 .buy .btn { padding: 9px 16px; font-size: 15px; }
+.variant { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.vbtn { border: 0; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line); color: var(--ink-soft); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.vbtn:hover { color: var(--ink); }
+.vbtn[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-fg); box-shadow: none; }
+.vtag { background: var(--grey-soft); color: var(--ink); border-radius: 10px; padding: 6px 10px; font-size: 13px; font-weight: 700; }
+.stock { font-size: 13px; font-weight: 700; color: var(--green); margin-top: 6px; }
+.stock.out { color: var(--ink-soft); }
+.btn:disabled, .qty button:disabled { background: var(--grey-soft); color: var(--ink-soft); cursor: not-allowed; transform: none; }
 .nothing { grid-column: 1 / -1; color: var(--ink-soft); text-align: center; padding-block: 30px; }
 
 /* Delivery */
@@ -429,6 +437,9 @@ const T = {
     'f.comment': 'Комментарий (необязательно)', 'f.comment.ph': 'Например, привезти после 18:00',
     'send': 'Отправить заказ в WhatsApp', 'send.note': 'Откроется WhatsApp с готовым сообщением. Заказ принят, когда мы ответим.',
     'send.err': 'Укажите имя и адрес, чтобы мы знали, куда везти.',
+    'v.set': n => `Набор ${n} шт`, 'v.pc': '1 шт',
+    'stock': n => `В наличии: ${n} шт`, 'stock.set': 'В наличии: 1 набор',
+    'soldout': 'Всё уже в корзине', 'soldout.btn': 'Нет в наличии', 'noMore': 'Больше нет в наличии',
     'inCart': 'в корзине', 'copied': 'Номер скопирован', 'copyFail': 'Выделите номер и скопируйте вручную',
     'minus': 'Убрать один', 'plus': 'Добавить один',
     'theme.light': 'Включить светлую тему', 'theme.dark': 'Включить тёмную тему',
@@ -479,6 +490,9 @@ const T = {
     'f.comment': 'Şərh (istəyə bağlı)', 'f.comment.ph': 'Məsələn, 18:00-dan sonra gətirin',
     'send': 'Sifarişi WhatsApp-a göndər', 'send.note': 'Hazır mesajla WhatsApp açılacaq. Biz cavab verəndə sifariş qəbul olunur.',
     'send.err': 'Hara gətirəcəyimizi bilmək üçün adınızı və ünvanınızı yazın.',
+    'v.set': n => `${n} ədədlik dəst`, 'v.pc': '1 ədəd',
+    'stock': n => `Stokda: ${n} ədəd`, 'stock.set': 'Stokda: 1 dəst',
+    'soldout': 'Hamısı artıq səbətdədir', 'soldout.btn': 'Stokda yoxdur', 'noMore': 'Stokda daha yoxdur',
     'inCart': 'səbətdə', 'copied': 'Nömrə kopyalandı', 'copyFail': 'Nömrəni seçib əl ilə kopyalayın',
     'minus': 'Birini çıxar', 'plus': 'Birini əlavə et',
     'theme.light': 'İşıqlı temanı aç', 'theme.dark': 'Qaranlıq temanı aç',
@@ -488,6 +502,8 @@ const T = {
 };
 
 const CATS = ['all', 'squish', 'prank', 'active', 'fun'];
+/* pack: сколько штук в наборе (наличие = один набор). setOnly: только набором.
+   pcPrice: цена за 1 шт, если можно купить поштучно. Без pack — в наличии 1 шт. */
 const PRODUCTS = [
   { id: 'dragon', img: 'p06.jpg', cat: 'fun', price: 12, age: 6, badge: 'hit',
     name: { ru: 'Светящийся дракон', az: 'İşıq saçan əjdaha' },
@@ -497,21 +513,21 @@ const PRODUCTS = [
     note: { ru: 'Стреляет присосками на леске, в наборе маска и запасные присоски', az: 'Sapa bağlı sorucu oxlar atır, dəstdə maska və ehtiyat oxlar var' } },
   { id: 'croc', img: 'p04.jpg', cat: 'fun', price: 6, age: 3,
     name: { ru: 'Игра «Кусачий крокодил»', az: '«Dişləyən timsah» oyunu' },
-    note: { ru: 'Нажимайте на зубы по очереди: кого укусит? Цвет случайный', az: 'Növbə ilə dişlərə basın: kimi dişləyəcək? Rəngi təsadüfi' } },
-  { id: 'grape', img: 'p07.jpg', cat: 'squish', price: 5, age: 3,
-    name: { ru: 'Сквиш «Виноград»', az: 'Skviş «Üzüm»' },
-    note: { ru: '1 сквиш из фиолетовой коллекции, модель случайная', az: 'Bənövşəyi kolleksiyadan 1 skviş, model təsadüfi' } },
-  { id: 'cheese', img: 'p08.jpg', cat: 'squish', price: 5, age: 3,
-    name: { ru: 'Сквиш «Сыр и булочки»', az: 'Skviş «Pendir və çörək»' },
-    note: { ru: '1 сквиш: сыр, бургер, хлеб или масло, модель случайная', az: '1 skviş: pendir, burger, çörək və ya yağ, model təsadüfi' } },
-  { id: 'blue', img: 'p09.jpg', cat: 'squish', price: 5, age: 3,
-    name: { ru: 'Сквиш «Голубой лёд»', az: 'Skviş «Mavi buz»' },
-    note: { ru: '1 сквиш из голубой коллекции с блёстками, модель случайная', az: 'Parıltılı mavi kolleksiyadan 1 skviş, model təsadüfi' } },
-  { id: 'pink', img: 'p10.jpg', cat: 'squish', price: 5, age: 3,
-    name: { ru: 'Сквиш «Розовый микс»', az: 'Skviş «Çəhrayı miks»' },
-    note: { ru: '1 сквиш из розовой коллекции, соберите весь набор', az: 'Çəhrayı kolleksiyadan 1 skviş, bütün dəsti toplayın' } },
-  { id: 'finger', img: 'p02.jpg', cat: 'fun', price: 8, age: 6,
-    name: { ru: 'Фингерборды, 12 шт', az: 'Barmaq skeytbordları, 12 əd.' },
+    note: { ru: 'Нажимайте на зубы по очереди: кого укусит?', az: 'Növbə ilə dişlərə basın: kimi dişləyəcək?' } },
+  { id: 'grape', img: 'p07.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+    name: { ru: 'Набор сквишей «Виноград»', az: 'Skviş dəsti «Üzüm»' },
+    note: { ru: '6 фиолетовых сквишей, как на фото', az: 'Fotodakı kimi 6 bənövşəyi skviş' } },
+  { id: 'cheese', img: 'p08.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+    name: { ru: 'Набор сквишей «Сыр и булочки»', az: 'Skviş dəsti «Pendir və çörək»' },
+    note: { ru: '6 сквишей: сыр, тост, бургер, хлеб и масло, как на фото', az: '6 skviş: pendir, tost, burger, çörək və yağ, fotodakı kimi' } },
+  { id: 'blue', img: 'p09.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+    name: { ru: 'Набор сквишей «Голубой лёд»', az: 'Skviş dəsti «Mavi buz»' },
+    note: { ru: '6 голубых сквишей с блёстками, как на фото', az: 'Fotodakı kimi 6 parıltılı mavi skviş' } },
+  { id: 'pink', img: 'p10.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+    name: { ru: 'Набор сквишей «Розовый микс»', az: 'Skviş dəsti «Çəhrayı miks»' },
+    note: { ru: '6 розовых сквишей, как на фото', az: 'Fotodakı kimi 6 çəhrayı skviş' } },
+  { id: 'finger', img: 'p02.jpg', cat: 'fun', price: 8, pcPrice: 1, age: 6, pack: 12,
+    name: { ru: 'Фингерборды', az: 'Barmaq skeytbordları' },
     note: { ru: 'Мини-скейты для пальцев с разными рисунками', az: 'Müxtəlif şəkilli barmaq üçün mini skeytlər' } },
   { id: 'katana', img: 'p05.jpg', cat: 'active', price: 9, age: 6,
     name: { ru: 'Игрушечная катана', az: 'Oyuncaq katana' },
@@ -522,19 +538,35 @@ const PRODUCTS = [
   { id: 'ball', img: 'p15.jpg', cat: 'active', price: 3, age: 3,
     name: { ru: 'Надувной мяч, 27 см', az: 'Şişmə top, 27 sm' },
     note: { ru: 'Разноцветный, для пляжа и бассейна', az: 'Rəngarəng, çimərlik və hovuz üçün' } },
-  { id: 'glasses', img: 'p12.jpg', cat: 'prank', price: 10, age: 6,
-    name: { ru: 'Пиксельные очки, 6 шт', az: 'Piksel eynəklər, 6 əd.' },
+  { id: 'glasses', img: 'p12.jpg', cat: 'prank', price: 10, pcPrice: 2, age: 6, pack: 6,
+    name: { ru: 'Пиксельные очки', az: 'Piksel eynəklər' },
     note: { ru: 'Разные цвета, для фото и вечеринок', az: 'Müxtəlif rənglər, foto və şənliklər üçün' } },
-  { id: 'cushion', img: 'p11.jpg', cat: 'prank', price: 3, age: 6,
-    name: { ru: 'Подушка-пищалка, 2 шт', az: 'Səsli yastıq, 2 əd.' },
+  { id: 'cushion', img: 'p11.jpg', cat: 'prank', price: 3, pcPrice: 2, age: 6, pack: 2,
+    name: { ru: 'Подушка-пищалка', az: 'Səsli yastıq' },
     note: { ru: 'Классический прикол, цвета случайные', az: 'Klassik zarafat, rənglər təsadüfi' } },
-  { id: 'knife', img: 'p13.jpg', cat: 'prank', price: 7, age: 8,
-    name: { ru: 'Нож-обманка, 7 шт', az: 'Zarafat bıçağı, 7 əd.' },
+  { id: 'knife', img: 'p13.jpg', cat: 'prank', price: 7, pcPrice: 1, age: 8, pack: 7,
+    name: { ru: 'Нож-обманка', az: 'Zarafat bıçağı' },
     note: { ru: 'Пластиковое лезвие прячется в ручку, безопасно', az: 'Plastik tiyə dəstəyə girir, təhlükəsizdir' } },
-  { id: 'mustache', img: 'p14.jpg', cat: 'prank', price: 4, age: 6,
-    name: { ru: 'Накладные усы, 10 шт', az: 'Yapışan bığlar, 10 əd.' },
+  { id: 'mustache', img: 'p14.jpg', cat: 'prank', price: 4, age: 6, pack: 10, setOnly: true,
+    name: { ru: 'Накладные усы', az: 'Yapışan bığlar' },
     note: { ru: '10 разных фасонов, на клейкой основе', az: '10 fərqli forma, yapışqanlı' } },
 ];
+
+/* Варианты покупки и наличие (в штуках) */
+function variants(p) {
+  if (p.pack && !p.setOnly) return [{ k: 'set', n: p.pack, price: p.price }, { k: 'pc', n: 1, price: p.pcPrice }];
+  if (p.pack) return [{ k: 'set', n: p.pack, price: p.price }];
+  return [{ k: 'one', n: 1, price: p.price }];
+}
+const stockOf = p => p.pack || 1;
+const findVariant = (p, k) => variants(p).find(v => v.k === k);
+const usedOf = p => Object.entries(cart).reduce((s, [key, q]) => {
+  const [id, k] = key.split(':'); if (id !== p.id) return s;
+  const v = findVariant(p, k); return s + (v ? v.n * q : 0);
+}, 0);
+const leftOf = p => stockOf(p) - usedOf(p);
+const canAdd = (p, v) => leftOf(p) >= v.n;
+const picked = {};
 
 const ICONS = {
   truck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
@@ -606,7 +638,17 @@ function applyTexts() {
 }
 
 /* Cards */
+const vLabel = (p, v) => v.k === 'set' ? t('v.set', v.n) : v.k === 'pc' ? t('v.pc') : '';
+function stockText(p) {
+  const left = leftOf(p);
+  if (p.setOnly) return left >= p.pack ? t('stock.set') : t('soldout');
+  return left > 0 ? t('stock', left) : t('soldout');
+}
 function card(p) {
+  const vs = variants(p);
+  const v = findVariant(p, picked[p.id]) || vs[0];
+  const ok = canAdd(p, v);
+  const out = leftOf(p) < Math.min(...vs.map(x => x.n));
   return `<article class="card">
     <div class="art">
       <img src="${p.img}" alt="${p.name[lang]}" loading="lazy">
@@ -617,9 +659,13 @@ function card(p) {
       <span class="cat-label">${t('c.' + p.cat)}</span>
       <h3>${p.name[lang]}</h3>
       <p class="note">${p.note[lang]}</p>
+      ${vs.length > 1
+        ? `<div class="variant" role="group">${vs.map(x => `<button class="vbtn" data-pick="${p.id}:${x.k}" aria-pressed="${x.k === v.k}">${vLabel(p, x)} · ${azn(x.price)}</button>`).join('')}</div>`
+        : p.setOnly ? `<div class="variant"><span class="vtag">${t('v.set', p.pack)}</span></div>` : ''}
+      <p class="stock${out ? ' out' : ''}">${stockText(p)}</p>
       <div class="buy">
-        <span class="price">${azn(p.price)}</span>
-        <button class="btn" data-add="${p.id}">${t('add')}</button>
+        <span class="price">${azn(v.price)}</span>
+        <button class="btn" data-add="${p.id}:${v.k}" ${ok ? '' : 'disabled'}>${ok ? t('add') : t('soldout.btn')}</button>
       </div>
     </div>
   </article>`;
@@ -636,16 +682,22 @@ function renderGrid() {
   $('grid').innerHTML = list.length ? list.map(card).join('') : `<p class="nothing">${t('cat.nothing')}</p>`;
 }
 
-
-/* Cart */
+/* Cart: ключ = "id:вариант" */
+function lineOf(key) {
+  const [id, k] = key.split(':');
+  const p = PRODUCTS.find(x => x.id === id);
+  const v = p && findVariant(p, k);
+  return v ? { p, v } : null;
+}
 const count = () => Object.values(cart).reduce((a, b) => a + b, 0);
-const subtotal = () => Object.entries(cart).reduce((s, [id, q]) => s + (PRODUCTS.find(p => p.id === id)?.price || 0) * q, 0);
+const subtotal = () => Object.entries(cart).reduce((s, [key, q]) => { const l = lineOf(key); return s + (l ? l.v.price * q : 0); }, 0);
+const lineName = ({ p, v }) => p.name[lang] + (v.k === 'one' ? '' : ` (${vLabel(p, v)})`);
 
 function orderText() {
   const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
-  const lines = Object.entries(cart).map(([id, q]) => {
-    const p = PRODUCTS.find(x => x.id === id);
-    return `• ${p.name[lang]} × ${q} = ${azn(p.price * q)}`;
+  const lines = Object.entries(cart).map(([key, q]) => {
+    const l = lineOf(key);
+    return `• ${lineName(l)} × ${q} = ${azn(l.v.price * q)}`;
   });
   return [t('msg.hi'), ...lines, '',
     `${t('goods')}: ${azn(sub)}`,
@@ -660,8 +712,19 @@ function updateSendLink() {
   const a = $('sendWa'); if (a) a.href = waUrl(orderText());
 }
 
+function fixCart() {
+  for (const key of Object.keys(cart)) if (!lineOf(key) || !(cart[key] > 0)) delete cart[key];
+  for (const p of PRODUCTS) {
+    while (leftOf(p) < 0) {
+      const key = Object.keys(cart).find(k => k.startsWith(p.id + ':'));
+      if (!key) break;
+      if (--cart[key] <= 0) delete cart[key];
+    }
+  }
+}
+
 function renderCart() {
-  for (const id of Object.keys(cart)) if (!PRODUCTS.some(p => p.id === id)) delete cart[id];
+  fixCart();
   $('cartCount').textContent = count();
   const entries = Object.entries(cart);
   if (!entries.length) {
@@ -669,12 +732,13 @@ function renderCart() {
     $('checkoutBox').innerHTML = '';
     return;
   }
-  $('items').innerHTML = entries.map(([id, q]) => {
-    const p = PRODUCTS.find(x => x.id === id);
+  $('items').innerHTML = entries.map(([key, q]) => {
+    const l = lineOf(key);
+    const more = canAdd(l.p, l.v);
     return `<div class="item">
-      <div class="thumb"><img src="${p.img}" alt=""></div>
-      <div><div class="name">${p.name[lang]}</div><div class="sub">${azn(p.price)} × ${q} = ${azn(p.price * q)}</div></div>
-      <div class="qty"><button data-dec="${id}" aria-label="${t('minus')}">−</button><span>${q}</span><button data-inc="${id}" aria-label="${t('plus')}">+</button></div>
+      <div class="thumb"><img src="${l.p.img}" alt=""></div>
+      <div><div class="name">${lineName(l)}</div><div class="sub">${azn(l.v.price)} × ${q} = ${azn(l.v.price * q)}</div></div>
+      <div class="qty"><button data-dec="${key}" aria-label="${t('minus')}">−</button><span>${q}</span><button data-inc="${key}" aria-label="${t('plus')}" ${more ? '' : 'disabled'}>+</button></div>
     </div>`;
   }).join('');
   const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
@@ -701,9 +765,12 @@ function renderCart() {
 
 let tt;
 function toast(html) { const el = $('toast'); el.innerHTML = html; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 1800); }
-function add(id) {
-  cart[id] = (cart[id] || 0) + 1; saveCart(); renderCart();
-  toast(`<b>${PRODUCTS.find(x => x.id === id).name[lang]}</b> ${t('inCart')}`);
+function changed() { saveCart(); renderCart(); renderGrid(); }
+function add(key) {
+  const l = lineOf(key); if (!l) return;
+  if (!canAdd(l.p, l.v)) { toast(t('noMore')); return; }
+  cart[key] = (cart[key] || 0) + 1; changed();
+  toast(`<b>${lineName(l)}</b> ${t('inCart')}`);
 }
 function openCart() { $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').hidden = false; }
 function closeCart() { $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); $('scrim').hidden = true; }
@@ -719,9 +786,10 @@ document.addEventListener('click', e => {
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.lang) { lang = b.dataset.lang; store.set('squishaz-lang', lang); renderAll(); }
   if (b.dataset.cat) { filter = b.dataset.cat; renderFilters(); renderGrid(); }
+  if (b.dataset.pick) { const [id, k] = b.dataset.pick.split(':'); picked[id] = k; renderGrid(); }
   if (b.dataset.add) add(b.dataset.add);
-  if (b.dataset.inc) { cart[b.dataset.inc]++; saveCart(); renderCart(); }
-  if (b.dataset.dec) { if (--cart[b.dataset.dec] <= 0) delete cart[b.dataset.dec]; saveCart(); renderCart(); }
+  if (b.dataset.inc) add(b.dataset.inc);
+  if (b.dataset.dec) { if (--cart[b.dataset.dec] <= 0) delete cart[b.dataset.dec]; changed(); }
   if (b.dataset.copy) {
     try { navigator.clipboard.writeText(b.dataset.copy).then(() => toast(t('copied')), () => toast(t('copyFail'))); }
     catch (err) { toast(t('copyFail')); }
