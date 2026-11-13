@@ -437,7 +437,7 @@ const T = {
     'f.comment': 'Комментарий (необязательно)', 'f.comment.ph': 'Например, привезти после 18:00',
     'send': 'Отправить заказ в WhatsApp', 'send.note': 'Откроется WhatsApp с готовым сообщением. Заказ принят, когда мы ответим.',
     'send.err': 'Укажите имя и адрес, чтобы мы знали, куда везти.',
-    'v.set': n => `Набор ${n} шт`, 'v.pc': '1 шт',
+    'v.set': n => `Набор ${n} шт`, 'v.pc': 'поштучно', 'v.pcMin': n => `Поштучно от ${n} шт`, 'perPc': 'за шт',
     'stock': n => `В наличии: ${n} шт`, 'stock.set': 'В наличии: 1 набор',
     'soldout': 'Всё уже в корзине', 'soldout.btn': 'Нет в наличии', 'noMore': 'Больше нет в наличии',
     'inCart': 'в корзине', 'copied': 'Номер скопирован', 'copyFail': 'Выделите номер и скопируйте вручную',
@@ -490,7 +490,7 @@ const T = {
     'f.comment': 'Şərh (istəyə bağlı)', 'f.comment.ph': 'Məsələn, 18:00-dan sonra gətirin',
     'send': 'Sifarişi WhatsApp-a göndər', 'send.note': 'Hazır mesajla WhatsApp açılacaq. Biz cavab verəndə sifariş qəbul olunur.',
     'send.err': 'Hara gətirəcəyimizi bilmək üçün adınızı və ünvanınızı yazın.',
-    'v.set': n => `${n} ədədlik dəst`, 'v.pc': '1 ədəd',
+    'v.set': n => `${n} ədədlik dəst`, 'v.pc': 'ədədlə', 'v.pcMin': n => `Ədədlə, ${n} ədəddən`, 'perPc': 'ədədi',
     'stock': n => `Stokda: ${n} ədəd`, 'stock.set': 'Stokda: 1 dəst',
     'soldout': 'Hamısı artıq səbətdədir', 'soldout.btn': 'Stokda yoxdur', 'noMore': 'Stokda daha yoxdur',
     'inCart': 'səbətdə', 'copied': 'Nömrə kopyalandı', 'copyFail': 'Nömrəni seçib əl ilə kopyalayın',
@@ -505,31 +505,31 @@ const CATS = ['all', 'squish', 'prank', 'active', 'fun'];
 /* pack: сколько штук в наборе (наличие = один набор). setOnly: только набором.
    pcPrice: цена за 1 шт, если можно купить поштучно. Без pack — в наличии 1 шт. */
 const PRODUCTS = [
-  { id: 'dragon', img: 'p06.jpg', cat: 'fun', price: 12, age: 6, badge: 'hit',
+  { id: 'dragon', img: 'p06.jpg', cat: 'fun', price: 7, age: 6, badge: 'hit',
     name: { ru: 'Светящийся дракон', az: 'İşıq saçan əjdaha' },
     note: { ru: 'Гнётся в каждом суставе, светится в темноте после зарядки светом', az: 'Hər oynağı tərpənir, işıqdan sonra qaranlıqda parlayır' } },
-  { id: 'web', img: 'p03.jpg', cat: 'active', price: 12, age: 6, badge: 'new',
+  { id: 'web', img: 'p03.jpg', cat: 'active', price: 7, age: 6, badge: 'new',
     name: { ru: 'Перчатка-паутина с присосками', az: 'Sorucu oxlu hörümçək əlcəyi' },
     note: { ru: 'Стреляет присосками на леске, в наборе маска и запасные присоски', az: 'Sapa bağlı sorucu oxlar atır, dəstdə maska və ehtiyat oxlar var' } },
   { id: 'croc', img: 'p04.jpg', cat: 'fun', price: 6, age: 3,
     name: { ru: 'Игра «Кусачий крокодил»', az: '«Dişləyən timsah» oyunu' },
     note: { ru: 'Нажимайте на зубы по очереди: кого укусит?', az: 'Növbə ilə dişlərə basın: kimi dişləyəcək?' } },
-  { id: 'grape', img: 'p07.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+  { id: 'grape', img: 'p07.jpg', cat: 'squish', price: 7, age: 3, pack: 6, setOnly: true,
     name: { ru: 'Набор сквишей «Виноград»', az: 'Skviş dəsti «Üzüm»' },
     note: { ru: '6 фиолетовых сквишей, как на фото', az: 'Fotodakı kimi 6 bənövşəyi skviş' } },
-  { id: 'cheese', img: 'p08.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+  { id: 'cheese', img: 'p08.jpg', cat: 'squish', price: 7, age: 3, pack: 6, setOnly: true,
     name: { ru: 'Набор сквишей «Сыр и булочки»', az: 'Skviş dəsti «Pendir və çörək»' },
     note: { ru: '6 сквишей: сыр, тост, бургер, хлеб и масло, как на фото', az: '6 skviş: pendir, tost, burger, çörək və yağ, fotodakı kimi' } },
-  { id: 'blue', img: 'p09.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+  { id: 'blue', img: 'p09.jpg', cat: 'squish', price: 7, age: 3, pack: 6, setOnly: true,
     name: { ru: 'Набор сквишей «Голубой лёд»', az: 'Skviş dəsti «Mavi buz»' },
     note: { ru: '6 голубых сквишей с блёстками, как на фото', az: 'Fotodakı kimi 6 parıltılı mavi skviş' } },
-  { id: 'pink', img: 'p10.jpg', cat: 'squish', price: 25, age: 3, pack: 6, setOnly: true,
+  { id: 'pink', img: 'p10.jpg', cat: 'squish', price: 7, age: 3, pack: 6, setOnly: true,
     name: { ru: 'Набор сквишей «Розовый микс»', az: 'Skviş dəsti «Çəhrayı miks»' },
     note: { ru: '6 розовых сквишей, как на фото', az: 'Fotodakı kimi 6 çəhrayı skviş' } },
-  { id: 'finger', img: 'p02.jpg', cat: 'fun', price: 8, pcPrice: 1, age: 6, pack: 12,
+  { id: 'finger', img: 'p02.jpg', cat: 'fun', price: 8, pcPrice: 1, minPc: 3, age: 6, pack: 12,
     name: { ru: 'Фингерборды', az: 'Barmaq skeytbordları' },
     note: { ru: 'Мини-скейты для пальцев с разными рисунками', az: 'Müxtəlif şəkilli barmaq üçün mini skeytlər' } },
-  { id: 'katana', img: 'p05.jpg', cat: 'active', price: 9, age: 6,
+  { id: 'katana', img: 'p05.jpg', cat: 'active', price: 5, age: 6,
     name: { ru: 'Игрушечная катана', az: 'Oyuncaq katana' },
     note: { ru: 'Лёгкий пластик, чёрная', az: 'Yüngül plastik, qara rəng' } },
   { id: 'bat', img: 'p01.jpg', cat: 'active', price: 7, age: 3,
@@ -554,7 +554,7 @@ const PRODUCTS = [
 
 /* Варианты покупки и наличие (в штуках) */
 function variants(p) {
-  if (p.pack && !p.setOnly) return [{ k: 'set', n: p.pack, price: p.price }, { k: 'pc', n: 1, price: p.pcPrice }];
+  if (p.pack && !p.setOnly) return [{ k: 'set', n: p.pack, price: p.price }, { k: 'pc', n: 1, price: p.pcPrice, min: p.minPc || 1 }];
   if (p.pack) return [{ k: 'set', n: p.pack, price: p.price }];
   return [{ k: 'one', n: 1, price: p.price }];
 }
@@ -565,7 +565,9 @@ const usedOf = p => Object.entries(cart).reduce((s, [key, q]) => {
   const v = findVariant(p, k); return s + (v ? v.n * q : 0);
 }, 0);
 const leftOf = p => stockOf(p) - usedOf(p);
-const canAdd = (p, v) => leftOf(p) >= v.n;
+/* Сколько штук добавится следующим нажатием: первый раз — минимум (например, от 3 шт), потом по одной */
+const stepOf = (p, v) => (cart[p.id + ':' + v.k] || 0) ? 1 : (v.min || 1);
+const canAdd = (p, v) => leftOf(p) >= v.n * stepOf(p, v);
 const picked = {};
 
 const ICONS = {
@@ -638,7 +640,8 @@ function applyTexts() {
 }
 
 /* Cards */
-const vLabel = (p, v) => v.k === 'set' ? t('v.set', v.n) : v.k === 'pc' ? t('v.pc') : '';
+const vLabel = (p, v) => v.k === 'set' ? t('v.set', v.n) : v.k === 'pc' ? (v.min > 1 ? t('v.pcMin', v.min) : t('v.pc')) : '';
+const vPrice = v => v.k === 'pc' ? `${azn(v.price)} ${t('perPc')}` : azn(v.price);
 function stockText(p) {
   const left = leftOf(p);
   if (p.setOnly) return left >= p.pack ? t('stock.set') : t('soldout');
@@ -648,7 +651,7 @@ function card(p) {
   const vs = variants(p);
   const v = findVariant(p, picked[p.id]) || vs[0];
   const ok = canAdd(p, v);
-  const out = leftOf(p) < Math.min(...vs.map(x => x.n));
+  const out = !vs.some(x => canAdd(p, x));
   return `<article class="card">
     <div class="art">
       <img src="${p.img}" alt="${p.name[lang]}" loading="lazy">
@@ -660,11 +663,11 @@ function card(p) {
       <h3>${p.name[lang]}</h3>
       <p class="note">${p.note[lang]}</p>
       ${vs.length > 1
-        ? `<div class="variant" role="group">${vs.map(x => `<button class="vbtn" data-pick="${p.id}:${x.k}" aria-pressed="${x.k === v.k}">${vLabel(p, x)} · ${azn(x.price)}</button>`).join('')}</div>`
+        ? `<div class="variant" role="group">${vs.map(x => `<button class="vbtn" data-pick="${p.id}:${x.k}" aria-pressed="${x.k === v.k}">${vLabel(p, x)} · ${vPrice(x)}</button>`).join('')}</div>`
         : p.setOnly ? `<div class="variant"><span class="vtag">${t('v.set', p.pack)}</span></div>` : ''}
       <p class="stock${out ? ' out' : ''}">${stockText(p)}</p>
       <div class="buy">
-        <span class="price">${azn(v.price)}</span>
+        <span class="price">${vPrice(v)}</span>
         <button class="btn" data-add="${p.id}:${v.k}" ${ok ? '' : 'disabled'}>${ok ? t('add') : t('soldout.btn')}</button>
       </div>
     </div>
@@ -691,7 +694,7 @@ function lineOf(key) {
 }
 const count = () => Object.values(cart).reduce((a, b) => a + b, 0);
 const subtotal = () => Object.entries(cart).reduce((s, [key, q]) => { const l = lineOf(key); return s + (l ? l.v.price * q : 0); }, 0);
-const lineName = ({ p, v }) => p.name[lang] + (v.k === 'one' ? '' : ` (${vLabel(p, v)})`);
+const lineName = ({ p, v }) => p.name[lang] + (v.k === 'set' ? ` (${vLabel(p, v)})` : v.k === 'pc' ? ` (${t('v.pc')})` : '');
 
 function orderText() {
   const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
@@ -713,12 +716,16 @@ function updateSendLink() {
 }
 
 function fixCart() {
-  for (const key of Object.keys(cart)) if (!lineOf(key) || !(cart[key] > 0)) delete cart[key];
+  for (const key of Object.keys(cart)) {
+    const l = lineOf(key);
+    if (!l || !(cart[key] >= (l.v.min || 1))) delete cart[key];
+  }
   for (const p of PRODUCTS) {
     while (leftOf(p) < 0) {
       const key = Object.keys(cart).find(k => k.startsWith(p.id + ':'));
       if (!key) break;
-      if (--cart[key] <= 0) delete cart[key];
+      const l = lineOf(key);
+      if (--cart[key] < (l.v.min || 1)) delete cart[key];
     }
   }
 }
@@ -769,7 +776,7 @@ function changed() { saveCart(); renderCart(); renderGrid(); }
 function add(key) {
   const l = lineOf(key); if (!l) return;
   if (!canAdd(l.p, l.v)) { toast(t('noMore')); return; }
-  cart[key] = (cart[key] || 0) + 1; changed();
+  cart[key] = (cart[key] || 0) + stepOf(l.p, l.v); changed();
   toast(`<b>${lineName(l)}</b> ${t('inCart')}`);
 }
 function openCart() { $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').hidden = false; }
@@ -789,7 +796,11 @@ document.addEventListener('click', e => {
   if (b.dataset.pick) { const [id, k] = b.dataset.pick.split(':'); picked[id] = k; renderGrid(); }
   if (b.dataset.add) add(b.dataset.add);
   if (b.dataset.inc) add(b.dataset.inc);
-  if (b.dataset.dec) { if (--cart[b.dataset.dec] <= 0) delete cart[b.dataset.dec]; changed(); }
+  if (b.dataset.dec) {
+    const l = lineOf(b.dataset.dec);
+    if (--cart[b.dataset.dec] < ((l && l.v.min) || 1)) delete cart[b.dataset.dec];
+    changed();
+  }
   if (b.dataset.copy) {
     try { navigator.clipboard.writeText(b.dataset.copy).then(() => toast(t('copied')), () => toast(t('copyFail'))); }
     catch (err) { toast(t('copyFail')); }
