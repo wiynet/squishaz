@@ -170,7 +170,8 @@ section { padding-block: 48px; }
 .search svg { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--ink-soft); }
 .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 20px; }
 .card { background: var(--surface); border-radius: var(--r); border: 1px solid var(--line); overflow: hidden; display: flex; flex-direction: column; transition: box-shadow .2s ease, transform .2s ease; }
-.card:hover { box-shadow: 0 10px 30px rgba(18,20,18,.08); transform: translateY(-2px); }
+.card:hover { box-shadow: 0 14px 34px rgba(18,20,18,.12); translate: 0 -4px; }
+.card { transition: box-shadow .25s ease, translate .25s ease; }
 .card .art { aspect-ratio: 1; position: relative; background: #fff; overflow: hidden; }
 .card .art img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .3s ease; }
 .card:hover .art img { transform: scale(1.04); }
@@ -220,7 +221,7 @@ section { padding-block: 48px; }
 .faq summary { cursor: pointer; font-weight: 700; padding-block: 14px; list-style: none; display: flex; justify-content: space-between; gap: 12px; }
 .faq summary::-webkit-details-marker { display: none; }
 .faq summary::after { content: "+"; font-size: 22px; line-height: 1; color: var(--green); flex: none; }
-.faq details[open] summary::after { content: "−"; }
+.faq details[open] summary::after { rotate: 45deg; }
 .faq details p { color: var(--ink-soft); padding-bottom: 16px; max-width: 65ch; }
 
 footer { background: var(--black); color: #8f948e; font-size: 14px; }
@@ -391,7 +392,8 @@ body[data-view="catalog"] .v-home, body:not([data-view="catalog"]) .v-catalog { 
 .step .num { width: 44px; height: 44px; border-radius: 14px; background: var(--yellow); color: #121412; font-weight: 800; font-size: 20px; display: grid; place-items: center; margin-bottom: 6px; transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
 .step:nth-child(2) .num { background: var(--green); color: #fff; }
 .step:nth-child(3) .num { background: var(--chip-on-bg); color: var(--chip-on-fg); }
-.step:hover .num { transform: rotate(-8deg) scale(1.08); }
+.step:hover .num { rotate: -8deg; scale: 1.08; }
+.step .num { transition: rotate .3s cubic-bezier(.3,1.6,.5,1), scale .3s cubic-bezier(.3,1.6,.5,1); }
 .step b { font-size: 17px; }
 .step p { color: var(--ink-soft); font-size: 14px; }
 
@@ -444,6 +446,111 @@ body[data-view="catalog"] .v-home, body:not([data-view="catalog"]) .v-catalog { 
   body.has-cart .toast { bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
 }
 .share-btn { border: 0; background: transparent; color: var(--yellow); font-weight: 700; padding: 0; text-decoration: underline; text-underline-offset: 4px; }
+
+/* ---------- Анимации везде ---------- */
+/* Шапка: тень при прокрутке и полоска прогресса страницы */
+header { transition: box-shadow .3s ease; }
+header.scrolled { box-shadow: 0 8px 24px rgba(0,0,0,.28); }
+@supports (animation-timeline: scroll()) {
+  header::after {
+    content: ""; position: absolute; left: 0; bottom: -1px; width: 100%; height: 3px; background: var(--yellow);
+    transform-origin: 0 50%; transform: scaleX(0); animation: progress linear both; animation-timeline: scroll(root);
+  }
+  @keyframes progress { to { transform: scaleX(1); } }
+}
+.logo { display: inline-block; transition: transform .35s cubic-bezier(.3,1.6,.5,1); }
+.logo:hover { transform: rotate(-4deg) scale(1.06); }
+.logo span { display: inline-block; animation: wobble 5s ease-in-out infinite; }
+@keyframes wobble { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-10deg) translateY(-2px); } 95% { transform: rotate(7deg); } }
+.nav-links a { position: relative; transition: color .2s; }
+.nav-links a::after { content: ""; position: absolute; left: 0; right: 0; bottom: -5px; height: 2px; border-radius: 2px; background: var(--yellow); transform: scaleX(0); transition: transform .28s cubic-bezier(.2,.8,.2,1); }
+.nav-links a:hover::after { transform: scaleX(1); }
+.theme-btn.spin svg { animation: spin .55s cubic-bezier(.3,1.4,.5,1); }
+@keyframes spin { from { transform: rotate(-200deg) scale(.4); } }
+.theming, .theming * { transition: background-color .45s ease, color .45s ease, border-color .45s ease, box-shadow .45s ease !important; }
+
+/* Нажатия: всё слегка проминается, по кнопкам расходится волна */
+.lang button, .chip, .vbtn, .mbtn, .qty button, .x, .theme-btn, .up-add, .back, .share-btn, .copy { transition: transform .15s ease, background-color .2s, color .2s, box-shadow .2s; }
+.lang button:active, .chip:active, .vbtn:active, .mbtn:active, .qty button:active, .x:active, .theme-btn:active, .up-add:active, .back:active { transform: scale(.92); }
+.chip, .vbtn, .mbtn { position: relative; overflow: hidden; isolation: isolate; }
+.chip:hover, .vbtn:hover, .mbtn:hover { transform: translateY(-1px); }
+.rip { position: absolute; border-radius: 50%; background: rgba(255,255,255,.5); transform: scale(0); animation: rip .6s ease-out forwards; pointer-events: none; z-index: -1; }
+@keyframes rip { to { transform: scale(2.6); opacity: 0; } }
+.back:hover { translate: -3px 0; }
+.back { transition: translate .2s ease, color .2s; }
+
+/* Смена страницы и языка */
+main.page-in { animation: pageIn .45s cubic-bezier(.2,.8,.2,1); }
+@keyframes pageIn { from { opacity: 0; transform: translateY(14px); } }
+
+/* Баннер: переливающийся акцент */
+.hero h1 em {
+  background: linear-gradient(90deg, var(--yellow) 0%, var(--yellow) 35%, #fff6b0 50%, var(--yellow) 65%, var(--yellow) 100%);
+  background-size: 250% 100%; -webkit-background-clip: text; background-clip: text; color: transparent;
+  animation: shine 4.5s linear infinite;
+}
+@keyframes shine { from { background-position: 100% 0; } to { background-position: -150% 0; } }
+.benefit .ic svg { animation: floaty 2.6s ease-in-out infinite alternate; }
+.benefit:nth-child(2) .ic svg { animation-delay: .4s; }
+.benefit:nth-child(3) .ic svg { animation-delay: .8s; }
+.benefit:nth-child(4) .ic svg { animation-delay: 1.2s; }
+@keyframes floaty { to { transform: translateY(-3px); } }
+
+/* Заголовки разделов: полоска «прорисовывается» */
+.section-head h2::after { content: ""; display: block; width: 52px; height: 4px; border-radius: 4px; background: var(--yellow); margin-top: 10px; transform-origin: left; animation: grow .8s .25s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes grow { from { transform: scaleX(0); } }
+
+/* Появление блоков при прокрутке */
+@supports (animation-timeline: view()) {
+  .section-head, .del, .faq details, footer .wrap { animation: viewIn linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+  .section-head h2::after { animation: grow linear both; animation-timeline: view(); animation-range: entry 20% entry 70%; }
+  .step .num { animation: numPop linear both; animation-timeline: view(); animation-range: entry 20% entry 70%; }
+  @keyframes numPop { from { transform: scale(.4) rotate(-25deg); opacity: .2; } }
+}
+
+/* Доставка и вопросы */
+.del { transition: translate .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s; }
+.del:hover { translate: 0 -4px; box-shadow: 0 16px 34px rgba(0,0,0,.16); }
+.faq details { transition: border-color .25s; }
+.faq details:hover { border-color: var(--green); }
+.faq summary::after { transition: rotate .3s cubic-bezier(.3,1.6,.5,1); }
+.faq details[open] p { animation: fadeDown .35s ease both; }
+@keyframes fadeDown { from { opacity: 0; transform: translateY(-8px); } }
+
+/* Карточки */
+.badge { transform-origin: left center; animation: tag 4s ease-in-out infinite; }
+@keyframes tag { 0%, 86%, 100% { transform: none; } 90% { transform: rotate(-7deg) scale(1.05); } 95% { transform: rotate(4deg); } }
+.stock:not(.out)::before { content: ""; display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: var(--green); margin-right: 6px; vertical-align: 1px; animation: blink 1.8s ease-in-out infinite; }
+.price.pop, .cart-count.pop, .cb-sum.pop { animation: countPop .45s cubic-bezier(.3,1.8,.5,1); }
+.price { display: inline-block; }
+@keyframes countPop { 40% { transform: scale(1.35); } }
+.search input { transition: border-color .2s, box-shadow .25s; }
+.search input:focus { box-shadow: 0 0 0 4px rgba(34,168,97,.18); }
+.search svg { transition: color .2s, transform .25s cubic-bezier(.3,1.6,.5,1); }
+.search:focus-within svg { color: var(--green); transform: translateY(-50%) scale(1.18); }
+
+/* Корзина: строки въезжают при открытии */
+.drawer.opening .item { animation: itemIn .4s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--i, 0) * 60ms + 120ms); }
+.drawer.opening .upsell, .drawer.opening .totals, .drawer.opening .checkout { animation: rise .5s cubic-bezier(.2,.8,.2,1) both; animation-delay: .25s; }
+@keyframes itemIn { from { opacity: 0; transform: translateX(28px); } }
+.drawer.opening .empty { animation: rise .5s .15s both; }
+.scrim:not([hidden]) { animation: fade .25s ease both; }
+
+/* Окно товара закрывается плавно */
+.modal.closing { animation: fadeOut .2s ease forwards; }
+.modal.closing .sheet { animation: sheetOut .2s ease forwards; }
+@keyframes fadeOut { to { opacity: 0; } }
+@keyframes sheetOut { to { opacity: 0; transform: translateY(16px) scale(.97); } }
+.sheet .pic img { animation: zoomIn .6s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes zoomIn { from { transform: scale(1.08); } }
+
+/* Плавающие кнопки и уведомление */
+.wa-float svg { animation: wiggle 5s ease-in-out infinite; }
+@keyframes wiggle { 0%, 88%, 100% { transform: none; } 91% { transform: rotate(-16deg) scale(1.1); } 94% { transform: rotate(12deg); } 97% { transform: rotate(-6deg); } }
+.toast { transition: transform .4s cubic-bezier(.3,1.5,.5,1), opacity .2s ease; }
+.cb-go { transition: transform .2s; }
+.cartbar-in:active .cb-go { transform: scale(.94); }
+.share-btn:hover { letter-spacing: .02em; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -883,8 +990,12 @@ function paintThemeBtn() {
 { const saved = store.get('squishaz-theme'); if (saved === 'dark' || saved === 'light') root.dataset.theme = saved; }
 $('themeBtn').addEventListener('click', () => {
   const next = isDark() ? 'light' : 'dark';
+  if (!reduced) { root.classList.add('theming'); setTimeout(() => root.classList.remove('theming'), 500); }
   root.dataset.theme = next; store.set('squishaz-theme', next); paintThemeBtn();
+  replay($('themeBtn'), 'spin');
 });
+/* Перезапуск CSS-анимации на элементе */
+function replay(el, cls) { if (!el || reduced) return; el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls); }
 matchMedia('(prefers-color-scheme: dark)').addEventListener('change', paintThemeBtn);
 new MutationObserver(paintThemeBtn).observe(root, { attributes: true, attributeFilter: ['data-theme'] });
 
@@ -977,6 +1088,7 @@ function route() {
   const was = document.body.dataset.view;
   document.body.dataset.view = view;
   closeModal(); closeCart();
+  if (was && was !== view) replay(document.querySelector('main'), 'page-in');
   if (view === 'catalog') {
     if (was !== 'catalog') { window.scrollTo({ top: 0, behavior: 'instant' }); renderGrid(true); }
     return;
@@ -1006,11 +1118,20 @@ function renderModal() {
     </div>`;
 }
 function openModal(id) {
+  clearTimeout(modalTimer); $('modal').classList.remove('closing');
   viewing = id; renderModal();
   $('modal').hidden = false; document.body.style.overflow = 'hidden';
   $('sheet').querySelector('.sheet-x').focus();
 }
-function closeModal() { viewing = null; $('modal').hidden = true; document.body.style.overflow = ''; }
+function closeModal() {
+  const m = $('modal');
+  if (m.hidden) { viewing = null; return; }
+  viewing = null; document.body.style.overflow = '';
+  if (reduced) { m.hidden = true; return; }
+  m.classList.add('closing');
+  modalTimer = setTimeout(() => { m.hidden = true; m.classList.remove('closing'); }, 190);
+}
+let modalTimer;
 
 /* Cart: ключ = "id:вариант" */
 function lineOf(key) {
@@ -1062,6 +1183,7 @@ let lastPct = 0;
 function renderCart() {
   fixCart();
   const n = count();
+  if (String(n) !== $('cartCount').textContent) { replay($('cartCount'), 'pop'); replay($('cbSum'), 'pop'); }
   $('cartCount').textContent = n;
   document.body.classList.toggle('has-cart', n > 0);
   $('cartbar').hidden = !n;
@@ -1073,10 +1195,10 @@ function renderCart() {
     lastPct = 0;
     return;
   }
-  $('items').innerHTML = entries.map(([key, q]) => {
+  $('items').innerHTML = entries.map(([key, q], idx) => {
     const l = lineOf(key);
     const more = canAdd(l.p, l.v);
-    return `<div class="item">
+    return `<div class="item" style="--i:${idx}">
       <div class="thumb"><img src="${l.p.img}" alt=""></div>
       <div><div class="name">${lineName(l)}</div><div class="sub">${azn(l.v.price)} × ${q} = ${azn(l.v.price * q)}</div></div>
       <div class="qty"><button data-dec="${key}" aria-label="${t('minus')}">−</button><span>${q}</span><button data-inc="${key}" aria-label="${t('plus')}" ${more ? '' : 'disabled'}>+</button></div>
@@ -1152,7 +1274,11 @@ function add(key, img) {
   cart[key] = (cart[key] || 0) + stepOf(l.p, l.v); changed();
   toast(`<b>${lineName(l)}</b> ${t('inCart')}`);
 }
-function openCart() { closeModal(); $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').hidden = false; }
+function openCart() {
+  closeModal();
+  const dr = $('drawer');
+  if (!dr.classList.contains('open')) { replay(dr, 'opening'); setTimeout(() => dr.classList.remove('opening'), 1100); }
+  dr.classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').hidden = false; }
 function closeCart() { $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); $('scrim').hidden = true; }
 
 async function share() {
@@ -1185,9 +1311,12 @@ document.addEventListener('click', e => {
     e.preventDefault(); $('sendErr').hidden = false; (form.name.trim() ? $('cAddr') : $('cName')).focus(); return;
   }
   const b = e.target.closest('button'); if (!b) return;
-  if (b.dataset.lang) { lang = b.dataset.lang; store.set('squishaz-lang', lang); renderAll(); }
+  if (b.dataset.lang && b.dataset.lang !== lang) { lang = b.dataset.lang; store.set('squishaz-lang', lang); renderAll(); replay(document.querySelector('main'), 'page-in'); }
   if (b.dataset.cat) { filter = b.dataset.cat; renderFilters(); renderGrid(true); }
-  if (b.dataset.pick) { const [id, k] = b.dataset.pick.split(':'); picked[id] = k; renderGrid(); if (viewing) renderModal(); }
+  if (b.dataset.pick) {
+    const [id, k] = b.dataset.pick.split(':'); picked[id] = k; renderGrid(); if (viewing) renderModal();
+    document.querySelectorAll(`[data-add^="${id}:"]`).forEach(x => replay(x.closest('.buy')?.querySelector('.price'), 'pop'));
+  }
   if (b.dataset.view) {
     const img = b.querySelector('img');
     if (!reduced) { img.classList.remove('squish'); void img.offsetWidth; img.classList.add('squish'); }
@@ -1224,6 +1353,20 @@ document.addEventListener('keydown', e => {
   if (e.key !== 'Escape') return;
   if (!$('modal').hidden) closeModal(); else closeCart();
 });
+
+/* Волна от нажатия на кнопки */
+document.addEventListener('pointerdown', e => {
+  const b = e.target.closest('.btn, .chip, .vbtn, .mbtn');
+  if (!b || reduced || b.disabled) return;
+  const r = b.getBoundingClientRect(), s = Math.max(r.width, r.height);
+  const sp = document.createElement('span');
+  sp.className = 'rip';
+  sp.style.cssText = `width:${s}px;height:${s}px;left:${e.clientX - r.left - s / 2}px;top:${e.clientY - r.top - s / 2}px`;
+  b.appendChild(sp); setTimeout(() => sp.remove(), 650);
+});
+/* Тень у шапки при прокрутке */
+const hdr = document.querySelector('header');
+window.addEventListener('scroll', () => hdr.classList.toggle('scrolled', window.scrollY > 8), { passive: true });
 
 renderAll();
 route();
