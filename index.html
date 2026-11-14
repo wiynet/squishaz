@@ -80,9 +80,13 @@ section { scroll-margin-top: 80px; }
 .btn.outline:hover { box-shadow: inset 0 0 0 2px var(--yellow); }
 .btn svg { width: 18px; height: 18px; flex: none; }
 
-/* Announcement bar */
-.bar { background: var(--yellow); color: #121412; font-size: 14px; font-weight: 700; text-align: center; }
-.bar .wrap { padding-block: 8px; }
+/* Announcement bar: бегущая строка */
+.bar { background: var(--yellow); color: #121412; font-size: 14px; font-weight: 700; overflow: hidden; }
+.track { display: flex; width: max-content; animation: marquee 36s linear infinite; }
+.bar:hover .track { animation-play-state: paused; }
+.track-in { display: flex; align-items: center; gap: 28px; padding: 8px 14px; white-space: nowrap; }
+.track-in i { font-style: normal; opacity: .45; }
+@keyframes marquee { to { transform: translateX(-50%); } }
 
 /* Header */
 body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 10; background: var(--black); }
@@ -123,10 +127,9 @@ header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; backg
 .perks { display: flex; flex-wrap: wrap; gap: 10px 28px; margin-top: 30px; font-size: 14px; color: #b9beb8; }
 .perks b { color: #fff; font-weight: 700; }
 .showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.tile { border-radius: var(--r); aspect-ratio: 1; display: grid; place-items: center; position: relative; text-decoration: none; transition: transform .15s ease; }
-.tile:hover { transform: translateY(-3px); }
-.tile { overflow: hidden; background: #fff; }
-.tile img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tile { border-radius: var(--r); aspect-ratio: 1; display: grid; place-items: center; position: relative; text-decoration: none; overflow: hidden; background: #fff; }
+.tile img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .5s cubic-bezier(.2,.8,.2,1); }
+.tile:hover img { transform: scale(1.08); }
 .tile span { position: absolute; left: 10px; bottom: 10px; font-size: 13px; font-weight: 700; color: #121412; background: var(--yellow); padding: 4px 10px; border-radius: 999px; }
 @media (max-width: 860px) { .hero { grid-template-columns: 1fr; } .showcase { max-width: 440px; } }
 
@@ -266,13 +269,126 @@ footer b { color: #fff; }
 .toast b { color: var(--yellow); }
 .toast.show { transform: translate(-50%, 0); }
 
+/* ---------- Анимации ---------- */
+.btn { position: relative; overflow: hidden; isolation: isolate; }
+.btn::after {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background: linear-gradient(110deg, transparent 35%, rgba(255,255,255,.5) 50%, transparent 65%);
+  transform: translateX(-100%); transition: transform .7s ease;
+}
+.btn:hover::after { transform: translateX(100%); }
+.btn:disabled::after { display: none; }
+
+.hero-band {
+  background:
+    radial-gradient(520px 320px at 88% 8%, rgba(255,214,10,.16), transparent 70%),
+    radial-gradient(420px 300px at 4% 100%, rgba(34,168,97,.2), transparent 70%),
+    var(--black);
+}
+.in { animation: rise .7s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(var(--d, 0) * 90ms + 60ms); }
+@keyframes rise { from { opacity: 0; transform: translateY(18px); } }
+.tile {
+  animation: pop .6s cubic-bezier(.3,1.4,.5,1) both, bob 5s ease-in-out infinite alternate;
+  animation-delay: calc(var(--i) * 110ms + 250ms), calc(var(--i) * 600ms + 900ms);
+}
+@keyframes pop { from { opacity: 0; transform: scale(.85) rotate(-3deg); } }
+@keyframes bob { to { transform: translateY(-8px); } }
+.kicker i { animation: blink 1.8s ease-in-out infinite; }
+@keyframes blink { 50% { box-shadow: 0 0 0 6px rgba(34,168,97,.25); } }
+
+.stats { display: flex; flex-wrap: wrap; gap: 14px 34px; margin-top: 30px; }
+.stat b { display: block; font-size: 28px; font-weight: 800; color: #fff; letter-spacing: -0.02em; font-variant-numeric: tabular-nums; }
+.stat span { font-size: 13px; color: #b9beb8; }
+
+.benefit .ic { transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
+.benefit:hover .ic { transform: translateY(-3px) rotate(-8deg); }
+
+.art-btn { all: unset; display: block; width: 100%; height: 100%; cursor: zoom-in; }
+.art-btn:focus-visible { outline: 3px solid var(--green); outline-offset: -3px; }
+.squish { animation: squish .45s cubic-bezier(.3,1.6,.5,1); }
+@keyframes squish { 30% { transform: scale(1.12, .84); } 60% { transform: scale(.95, 1.07); } }
+
+.grid.anim .card { animation: cardIn .45s cubic-bezier(.2,.8,.2,1) both; animation-delay: calc(min(var(--i), 12) * 45ms); }
+@keyframes cardIn { from { opacity: 0; transform: translateY(16px) scale(.98); } }
+@supports (animation-timeline: view()) {
+  .grid:not(.anim) .card, .reveal { animation: viewIn linear both; animation-timeline: view(); animation-range: entry 0% entry 35%; }
+  @keyframes viewIn { from { opacity: .4; transform: translateY(28px) scale(.97); } }
+}
+
+.flyer { position: fixed; z-index: 40; margin: 0; object-fit: cover; border-radius: 16px; pointer-events: none; box-shadow: 0 12px 30px rgba(0,0,0,.3); }
+#openCart.bump { animation: bump .5s cubic-bezier(.3,1.6,.5,1); }
+@keyframes bump { 30% { transform: scale(1.15); } 60% { transform: scale(.95); } }
+
+.wa-float::after { content: ""; position: absolute; inset: 0; border-radius: 50%; animation: ring 2.4s ease-out infinite; }
+@keyframes ring { from { box-shadow: 0 0 0 0 rgba(34,168,97,.55); } to { box-shadow: 0 0 0 18px rgba(34,168,97,0); } }
+
+/* Как заказать */
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+.step { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r); padding: 22px; display: grid; gap: 6px; align-content: start; }
+.step .num { width: 44px; height: 44px; border-radius: 14px; background: var(--yellow); color: #121412; font-weight: 800; font-size: 20px; display: grid; place-items: center; margin-bottom: 6px; transition: transform .3s cubic-bezier(.3,1.6,.5,1); }
+.step:nth-child(2) .num { background: var(--green); color: #fff; }
+.step:nth-child(3) .num { background: var(--chip-on-bg); color: var(--chip-on-fg); }
+.step:hover .num { transform: rotate(-8deg) scale(1.08); }
+.step b { font-size: 17px; }
+.step p { color: var(--ink-soft); font-size: 14px; }
+
+/* Окно товара */
+.modal { position: fixed; inset: 0; z-index: 25; background: rgba(18,20,18,.6); display: grid; place-items: center; padding: 16px; animation: fade .2s ease both; }
+@keyframes fade { from { opacity: 0; } }
+.sheet {
+  position: relative; background: var(--surface); color: var(--ink); border-radius: 20px; width: min(880px, 100%);
+  max-height: calc(100dvh - 32px); overflow: auto; display: grid; grid-template-columns: 1fr 1fr;
+  animation: sheetIn .35s cubic-bezier(.2,.9,.3,1.15) both;
+}
+@keyframes sheetIn { from { opacity: 0; transform: translateY(24px) scale(.97); } }
+.sheet .pic { position: relative; background: #fff; aspect-ratio: 1; }
+.sheet .pic img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.sheet .info { padding: 26px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.sheet .info h2 { font-size: clamp(22px, 3vw, 30px); }
+.sheet .buy { margin-top: 10px; }
+.sheet .ask { margin-top: 4px; }
+.sheet-x { position: absolute; top: 12px; right: 12px; z-index: 2; }
+@media (max-width: 700px) { .sheet { grid-template-columns: 1fr; } .sheet .pic { aspect-ratio: 4 / 3; } }
+
+/* Подсказка в корзине */
+.progress i { transition: width .6s cubic-bezier(.2,.8,.2,1); }
+.upsell { background: var(--surface); border: 1.5px dashed var(--green); border-radius: 14px; padding: 12px; display: grid; gap: 8px; margin-bottom: 12px; }
+.upsell > b { font-size: 13px; }
+.up { display: grid; grid-template-columns: 40px 1fr auto auto; gap: 10px; align-items: center; font-size: 14px; }
+.up img { width: 40px; height: 40px; border-radius: 8px; object-fit: cover; background: #fff; }
+.up .nm { min-width: 0; font-weight: 600; }
+.up small { color: var(--ink-soft); font-weight: 500; }
+.up .pr { font-weight: 800; font-variant-numeric: tabular-nums; }
+.up-add { width: 30px; height: 30px; border-radius: 50%; border: 0; background: var(--yellow); color: #121412; font-weight: 800; font-size: 18px; line-height: 1; transition: transform .2s; }
+.up-add:hover { transform: scale(1.12); }
+
+/* Нижняя панель корзины на телефоне */
+.cartbar {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 14;
+  padding: 10px max(12px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(12px, env(safe-area-inset-left, 0px));
+  animation: slideUp .35s cubic-bezier(.2,.9,.3,1.15) both;
+}
+@keyframes slideUp { from { transform: translateY(110%); } }
+.cartbar-in {
+  width: 100%; border: 0; border-radius: 14px; background: var(--black); color: #fff; display: flex; align-items: center; gap: 12px;
+  padding: 12px 14px; font-weight: 700; box-shadow: 0 10px 30px rgba(0,0,0,.3), inset 0 0 0 1px var(--header-line);
+}
+.cb-sum { color: var(--yellow); font-variant-numeric: tabular-nums; }
+.cb-go { margin-left: auto; background: var(--yellow); color: #121412; padding: 6px 12px; border-radius: 10px; }
+@media (min-width: 761px) { .cartbar { display: none !important; } }
+@media (max-width: 760px) {
+  body.has-cart .wa-float { bottom: calc(86px + env(safe-area-inset-bottom, 0px)); }
+  body.has-cart .toast { bottom: calc(156px + env(safe-area-inset-bottom, 0px)); }
+}
+.share-btn { border: 0; background: transparent; color: var(--yellow); font-weight: 700; padding: 0; text-decoration: underline; text-underline-offset: 4px; }
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
 }
 </style>
 
-<div class="bar"><div class="wrap" data-i18n="bar"></div></div>
+<div class="bar"><div class="track" id="barTrack"></div></div>
 <header>
   <div class="wrap nav">
     <a class="logo" href="#top" id="top">Squish<span>Az</span></a>
@@ -296,18 +412,14 @@ footer b { color: #fff; }
   <div class="hero-band">
     <div class="wrap hero">
       <div>
-        <span class="kicker"><i></i><span data-i18n="hero.kicker"></span></span>
-        <h1 data-i18n="hero.title"></h1>
-        <p class="lead" data-i18n="hero.lead"></p>
-        <div class="hero-actions">
+        <span class="kicker in" style="--d:0"><i></i><span data-i18n="hero.kicker"></span></span>
+        <h1 class="in" style="--d:1" data-i18n="hero.title"></h1>
+        <p class="lead in" style="--d:2" data-i18n="hero.lead"></p>
+        <div class="hero-actions in" style="--d:3">
           <a class="btn" href="#catalog" data-i18n="hero.cta2"></a>
           <a class="btn outline wa-link" target="_blank" rel="noopener" data-i18n="wa.write"></a>
         </div>
-        <div class="perks">
-          <span data-i18n="perk1"></span>
-          <span data-i18n="perk2"></span>
-          <span data-i18n="perk3"></span>
-        </div>
+        <div class="stats in" style="--d:4" id="stats"></div>
       </div>
       <div class="showcase" id="showcase"></div>
     </div>
@@ -333,6 +445,18 @@ footer b { color: #fff; }
         <div class="chips" role="group" id="filters"></div>
       </div>
       <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <section id="how" style="padding-top:8px">
+    <div class="wrap">
+      <div class="section-head">
+        <div>
+          <h2 data-i18n="how.title"></h2>
+          <p data-i18n="how.lead"></p>
+        </div>
+      </div>
+      <div class="steps" id="steps"></div>
     </div>
   </section>
 
@@ -372,10 +496,18 @@ footer b { color: #fff; }
 </main>
 
 <footer>
-  <div class="wrap"><span data-i18n="footer.l"></span><span data-i18n="footer.r"></span></div>
+  <div class="wrap"><span data-i18n="footer.l"></span><button class="share-btn" data-share data-i18n="share"></button><span data-i18n="footer.r"></span></div>
 </footer>
 
 <a class="wa-float wa-link" target="_blank" rel="noopener" data-i18n-aria="wa.write" id="waFloat"></a>
+
+<div class="cartbar" id="cartbar" hidden>
+  <button class="cartbar-in" id="cartbarBtn"><span id="cbCount"></span><span class="cb-sum" id="cbSum"></span><span class="cb-go" id="cbGo"></span></button>
+</div>
+
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet" id="sheet"></div>
+</div>
 
 <div class="scrim" id="scrim" hidden></div>
 <aside class="drawer" id="drawer" aria-hidden="true">
@@ -390,6 +522,8 @@ footer b { color: #fff; }
 
 <script>
 const PHONE = '79941327880';
+const SITE = 'https://wiynet.github.io/squishaz/';
+const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const FREE_FROM = 25, SHIP = 3;
 
 const T = {
@@ -440,6 +574,21 @@ const T = {
     'v.set': n => `Набор ${n} шт`, 'v.pc': 'поштучно', 'v.pcMin': n => `Поштучно от ${n} шт`, 'perPc': 'за шт',
     'stock': n => `В наличии: ${n} шт`, 'stock.set': 'В наличии: 1 набор',
     'soldout': 'Всё уже в корзине', 'soldout.btn': 'Нет в наличии', 'noMore': 'Больше нет в наличии',
+    'bar.items': ['Бесплатная доставка по Баку от 25 ₼', 'Привезём сегодня или завтра', 'Заказ в WhatsApp за минуту', 'Наборы и поштучно'],
+    'bar.from': s => `Цены от ${s}`,
+    'st1': n => `<b data-count="${n}">${n}</b><span>игрушек в каталоге</span>`,
+    'st2': s => `<b>от ${s}</b><span>цены в каталоге</span>`,
+    'st3': '<b>от 25 ₼</b><span>бесплатная доставка</span>',
+    'how.title': 'Как заказать', 'how.lead': 'Три шага, и игрушка уже едет к вам.',
+    'how': [
+      ['Выберите игрушки', 'Добавьте в корзину набор или нужное количество штук.'],
+      ['Отправьте заказ в WhatsApp', 'Укажите имя и адрес, сайт сам соберёт сообщение с заказом.'],
+      ['Получите курьером', 'Привезём по Баку сегодня или завтра. От 25 ₼ доставка бесплатная.'],
+    ],
+    'more': 'Подробнее', 'close': 'Закрыть', 'ask': 'Спросить в WhatsApp', 'msg.ask': s => `Здравствуйте! Интересует: ${s}`,
+    'up.pick': 'Добавьте что-нибудь до бесплатной доставки:',
+    'cb.items': n => `Товаров: ${n}`, 'cb.go': 'Оформить',
+    'share': 'Поделиться сайтом', 'shared': 'Ссылка на сайт скопирована',
     'inCart': 'в корзине', 'copied': 'Номер скопирован', 'copyFail': 'Выделите номер и скопируйте вручную',
     'minus': 'Убрать один', 'plus': 'Добавить один',
     'theme.light': 'Включить светлую тему', 'theme.dark': 'Включить тёмную тему',
@@ -493,6 +642,21 @@ const T = {
     'v.set': n => `${n} ədədlik dəst`, 'v.pc': 'ədədlə', 'v.pcMin': n => `Ədədlə, ${n} ədəddən`, 'perPc': 'ədədi',
     'stock': n => `Stokda: ${n} ədəd`, 'stock.set': 'Stokda: 1 dəst',
     'soldout': 'Hamısı artıq səbətdədir', 'soldout.btn': 'Stokda yoxdur', 'noMore': 'Stokda daha yoxdur',
+    'bar.items': ['25 ₼-dan Bakı daxili pulsuz çatdırılma', 'Bu gün və ya sabah gətiririk', 'Bir dəqiqəyə WhatsApp-da sifariş', 'Dəstlə və ya ədədlə'],
+    'bar.from': s => `Qiymətlər ${s}-dan`,
+    'st1': n => `<b data-count="${n}">${n}</b><span>oyuncaq kataloqda</span>`,
+    'st2': s => `<b>${s}-dan</b><span>kataloqda qiymətlər</span>`,
+    'st3': '<b>25 ₼-dan</b><span>pulsuz çatdırılma</span>',
+    'how.title': 'Necə sifariş etmək olar', 'how.lead': 'Üç addım və oyuncaq artıq yoldadır.',
+    'how': [
+      ['Oyuncaqları seçin', 'Səbətə dəst və ya lazım olan sayda ədəd əlavə edin.'],
+      ['Sifarişi WhatsApp-a göndərin', 'Adınızı və ünvanınızı yazın, sayt sifariş mesajını özü hazırlayacaq.'],
+      ['Kuryerlə alın', 'Bakı daxilində bu gün və ya sabah gətiririk. 25 ₼-dan çatdırılma pulsuzdur.'],
+    ],
+    'more': 'Ətraflı', 'close': 'Bağla', 'ask': 'WhatsApp-da soruşun', 'msg.ask': s => `Salam! Maraqlanıram: ${s}`,
+    'up.pick': 'Pulsuz çatdırılma üçün nəsə əlavə edin:',
+    'cb.items': n => `Məhsul: ${n}`, 'cb.go': 'Sifariş et',
+    'share': 'Saytı paylaş', 'shared': 'Saytın linki kopyalandı',
     'inCart': 'səbətdə', 'copied': 'Nömrə kopyalandı', 'copyFail': 'Nömrəni seçib əl ilə kopyalayın',
     'minus': 'Birini çıxar', 'plus': 'Birini əlavə et',
     'theme.light': 'İşıqlı temanı aç', 'theme.dark': 'Qaranlıq temanı aç',
@@ -569,6 +733,7 @@ const leftOf = p => stockOf(p) - usedOf(p);
 const stepOf = (p, v) => (cart[p.id + ':' + v.k] || 0) ? 1 : (v.min || 1);
 const canAdd = (p, v) => leftOf(p) >= v.n * stepOf(p, v);
 const picked = {};
+const minPrice = () => Math.min(...PRODUCTS.flatMap(p => variants(p).map(v => v.price)));
 
 const ICONS = {
   truck: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"><path d="M3 6h11v10H3zM14 9h4l3 3v4h-7"/><circle cx="7" cy="17.5" r="1.8"/><circle cx="17" cy="17.5" r="1.8"/></svg>',
@@ -630,10 +795,15 @@ function applyTexts() {
   document.querySelectorAll('.del-actions .wa-link').forEach(a => { a.innerHTML = ICONS.wa + t('wa.write'); });
 
   $('showcase').innerHTML = [['p10.jpg', 'squish'], ['p12.jpg', 'prank'], ['p03.jpg', 'active'], ['p06.jpg', 'fun']]
-    .map(([src, cat]) => `<a class="tile" href="#catalog" data-tile="${cat}"><img src="${src}" alt="${t('tile.' + cat)}"><span>${t('tile.' + cat)}</span></a>`).join('');
+    .map(([src, cat], i) => `<a class="tile" style="--i:${i}" href="#catalog" data-tile="${cat}"><img src="${src}" alt="${t('tile.' + cat)}"><span>${t('tile.' + cat)}</span></a>`).join('');
 
   $('benefits').innerHTML = [['truck', 'b1'], ['check', 'b2'], ['age', 'b3'], ['chat', 'b4']]
-    .map(([ic, k]) => `<div class="benefit"><span class="ic">${ICONS[ic]}</span><div><b>${t(k + '.t')}</b><p>${t(k + '.p')}</p></div></div>`).join('');
+    .map(([ic, k]) => `<div class="benefit reveal"><span class="ic">${ICONS[ic]}</span><div><b>${t(k + '.t')}</b><p>${t(k + '.p')}</p></div></div>`).join('');
+
+  const row = [...t('bar.items'), t('bar.from', azn(minPrice()))].map(s => `<span>${s}</span><i aria-hidden="true">•</i>`).join('');
+  $('barTrack').innerHTML = `<div class="track-in">${row}</div><div class="track-in" aria-hidden="true">${row}</div>`;
+  $('stats').innerHTML = [t('st1', PRODUCTS.length), t('st2', azn(minPrice())), t('st3')].map(h => `<div class="stat">${h}</div>`).join('');
+  $('steps').innerHTML = t('how').map(([h, p], i) => `<div class="step reveal"><span class="num">${i + 1}</span><b>${h}</b><p>${p}</p></div>`).join('');
 
   $('faqList').innerHTML = t('faq').map(([q, a]) => `<details><summary>${q}</summary><p>${a}</p></details>`).join('');
   paintThemeBtn();
@@ -647,28 +817,31 @@ function stockText(p) {
   if (p.setOnly) return left >= p.pack ? t('stock.set') : t('soldout');
   return left > 0 ? t('stock', left) : t('soldout');
 }
-function card(p) {
+function buyBlock(p) {
   const vs = variants(p);
   const v = findVariant(p, picked[p.id]) || vs[0];
   const ok = canAdd(p, v);
   const out = !vs.some(x => canAdd(p, x));
-  return `<article class="card">
+  return `${vs.length > 1
+      ? `<div class="variant" role="group">${vs.map(x => `<button class="vbtn" data-pick="${p.id}:${x.k}" aria-pressed="${x.k === v.k}">${vLabel(p, x)} · ${vPrice(x)}</button>`).join('')}</div>`
+      : p.setOnly ? `<div class="variant"><span class="vtag">${t('v.set', p.pack)}</span></div>` : ''}
+    <p class="stock${out ? ' out' : ''}">${stockText(p)}</p>
+    <div class="buy">
+      <span class="price">${vPrice(v)}</span>
+      <button class="btn" data-add="${p.id}:${v.k}" ${ok ? '' : 'disabled'}>${ok ? t('add') : t('soldout.btn')}</button>
+    </div>`;
+}
+function card(p, i) {
+  return `<article class="card" style="--i:${i}">
     <div class="art">
-      <img src="${p.img}" alt="${p.name[lang]}" loading="lazy">
+      <button class="art-btn" data-view="${p.id}" aria-label="${t('more')}: ${p.name[lang]}"><img src="${p.img}" alt="${p.name[lang]}" loading="lazy"></button>
       ${p.badge ? `<span class="badge">${t('badge.' + p.badge)}</span>` : ''}
     </div>
     <div class="body">
       <span class="cat-label">${t('c.' + p.cat)}</span>
       <h3>${p.name[lang]}</h3>
       <p class="note">${p.note[lang]}</p>
-      ${vs.length > 1
-        ? `<div class="variant" role="group">${vs.map(x => `<button class="vbtn" data-pick="${p.id}:${x.k}" aria-pressed="${x.k === v.k}">${vLabel(p, x)} · ${vPrice(x)}</button>`).join('')}</div>`
-        : p.setOnly ? `<div class="variant"><span class="vtag">${t('v.set', p.pack)}</span></div>` : ''}
-      <p class="stock${out ? ' out' : ''}">${stockText(p)}</p>
-      <div class="buy">
-        <span class="price">${vPrice(v)}</span>
-        <button class="btn" data-add="${p.id}:${v.k}" ${ok ? '' : 'disabled'}>${ok ? t('add') : t('soldout.btn')}</button>
-      </div>
+      ${buyBlock(p)}
     </div>
   </article>`;
 }
@@ -677,12 +850,35 @@ function renderFilters() {
   $('filters').setAttribute('aria-label', t('cat.title'));
   $('filters').innerHTML = CATS.map(c => `<button class="chip" data-cat="${c}" aria-pressed="${c === filter}">${t('c.' + c)}</button>`).join('');
 }
-function renderGrid() {
+function renderGrid(animate) {
   const q = query.trim().toLowerCase();
   const list = PRODUCTS.filter(p => (filter === 'all' || p.cat === filter) &&
     (!q || [p.name.ru, p.name.az, p.note.ru, p.note.az].some(s => s.toLowerCase().includes(q))));
-  $('grid').innerHTML = list.length ? list.map(card).join('') : `<p class="nothing">${t('cat.nothing')}</p>`;
+  const g = $('grid');
+  g.innerHTML = list.length ? list.map(card).join('') : `<p class="nothing">${t('cat.nothing')}</p>`;
+  if (animate && !reduced) { g.classList.remove('anim'); void g.offsetWidth; g.classList.add('anim'); }
 }
+
+/* Окно товара */
+let viewing = null;
+function renderModal() {
+  const p = PRODUCTS.find(x => x.id === viewing); if (!p) return;
+  $('sheet').innerHTML = `<button class="x sheet-x" data-close aria-label="${t('close')}">×</button>
+    <div class="pic"><img src="${p.img}" alt="${p.name[lang]}">${p.badge ? `<span class="badge">${t('badge.' + p.badge)}</span>` : ''}</div>
+    <div class="info">
+      <span class="cat-label">${t('c.' + p.cat)}</span>
+      <h2 id="sheetTitle">${p.name[lang]}</h2>
+      <p class="note">${p.note[lang]}</p>
+      ${buyBlock(p)}
+      <a class="btn green ask" href="${waUrl(t('msg.ask', p.name[lang]))}" target="_blank" rel="noopener">${ICONS.wa}${t('ask')}</a>
+    </div>`;
+}
+function openModal(id) {
+  viewing = id; renderModal();
+  $('modal').hidden = false; document.body.style.overflow = 'hidden';
+  $('sheet').querySelector('.sheet-x').focus();
+}
+function closeModal() { viewing = null; $('modal').hidden = true; document.body.style.overflow = ''; }
 
 /* Cart: ключ = "id:вариант" */
 function lineOf(key) {
@@ -694,6 +890,7 @@ function lineOf(key) {
 const count = () => Object.values(cart).reduce((a, b) => a + b, 0);
 const subtotal = () => Math.round(Object.entries(cart).reduce((s, [key, q]) => { const l = lineOf(key); return s + (l ? l.v.price * q : 0); }, 0) * 100) / 100;
 const lineName = ({ p, v }) => p.name[lang] + (v.k === 'set' ? ` (${vLabel(p, v)})` : v.k === 'pc' ? ` (${t('v.pc')})` : '');
+const inCart = id => Object.keys(cart).some(k => k.startsWith(id + ':'));
 
 function orderText() {
   const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
@@ -729,13 +926,19 @@ function fixCart() {
   }
 }
 
+let lastPct = 0;
 function renderCart() {
   fixCart();
-  $('cartCount').textContent = count();
+  const n = count();
+  $('cartCount').textContent = n;
+  document.body.classList.toggle('has-cart', n > 0);
+  $('cartbar').hidden = !n;
+  if (n) { $('cbCount').textContent = t('cb.items', n); $('cbSum').textContent = azn(subtotal()); $('cbGo').textContent = t('cb.go'); }
   const entries = Object.entries(cart);
   if (!entries.length) {
     $('items').innerHTML = `<div class="empty"><b>${t('empty.t')}</b><span>${t('empty.p')}</span></div>`;
     $('checkoutBox').innerHTML = '';
+    lastPct = 0;
     return;
   }
   $('items').innerHTML = entries.map(([key, q]) => {
@@ -749,10 +952,19 @@ function renderCart() {
   }).join('');
   const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
   const pct = Math.min(100, Math.round(sub / FREE_FROM * 100));
-  $('checkoutBox').innerHTML = `
+  const need = FREE_FROM - sub;
+  const ideas = ship ? PRODUCTS.filter(p => !inCart(p.id)).map(p => ({ p, v: variants(p)[0] }))
+    .filter(x => canAdd(x.p, x.v)).sort((a, b) => Math.abs(a.v.price - need) - Math.abs(b.v.price - need)).slice(0, 3) : [];
+  const upsell = ideas.length ? `<div class="upsell"><b>${t('up.pick')}</b>${ideas.map(({ p, v }) => `<div class="up">
+      <img src="${p.img}" alt="">
+      <span class="nm">${p.name[lang]}${v.k === 'set' ? ` <small>${vLabel(p, v)}</small>` : ''}</span>
+      <span class="pr">${azn(v.price)}</span>
+      <button class="up-add" data-add="${p.id}:${v.k}" aria-label="${t('add')}: ${p.name[lang]}">+</button>
+    </div>`).join('')}</div>` : '';
+  $('checkoutBox').innerHTML = `${upsell}
     <div class="totals">
-      <div class="free-note">${ship ? t('left', azn(FREE_FROM - sub)) : t('gotFree')}</div>
-      <div class="progress" aria-hidden="true"><i style="width:${pct}%"></i></div>
+      <div class="free-note">${ship ? t('left', azn(need)) : t('gotFree')}</div>
+      <div class="progress" aria-hidden="true"><i style="width:${lastPct}%"></i></div>
       <div><span>${t('goods')}</span><span>${azn(sub)}</span></div>
       <div><span>${t('courier')}</span><span>${ship ? azn(ship) : t('free')}</span></div>
       <div class="sum"><span>${t('total')}</span><span>${azn(sub + ship)}</span></div>
@@ -765,48 +977,100 @@ function renderCart() {
       <a class="btn green" id="sendWa" target="_blank" rel="noopener">${ICONS.wa}${t('send')}</a>
       <p class="send-note">${t('send.note')}</p>
     </div>`;
+  const bar = $('checkoutBox').querySelector('.progress i');
+  void bar.offsetWidth; bar.style.width = pct + '%'; lastPct = pct;
   $('cName').value = form.name; $('cAddr').value = form.addr; $('cComment').value = form.comment;
   updateSendLink();
 }
 
 let tt;
 function toast(html) { const el = $('toast'); el.innerHTML = html; el.classList.add('show'); clearTimeout(tt); tt = setTimeout(() => el.classList.remove('show'), 1800); }
-function changed() { saveCart(); renderCart(); renderGrid(); }
-function add(key) {
+function bump() {
+  const b = $('openCart'); b.classList.remove('bump'); void b.offsetWidth; b.classList.add('bump');
+}
+/* Фото товара «летит» в корзину */
+function fly(img) {
+  const drawerOpen = $('drawer').classList.contains('open');
+  if (reduced || !img || drawerOpen || !img.animate) { bump(); return; }
+  const a = img.getBoundingClientRect(), b = $('openCart').getBoundingClientRect();
+  if (!a.width) { bump(); return; }
+  const c = img.cloneNode();
+  c.className = 'flyer'; c.removeAttribute('loading');
+  Object.assign(c.style, { left: a.left + 'px', top: a.top + 'px', width: a.width + 'px', height: a.height + 'px' });
+  document.body.appendChild(c);
+  const dx = b.left + b.width / 2 - (a.left + a.width / 2), dy = b.top + b.height / 2 - (a.top + a.height / 2);
+  const anim = c.animate([
+    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+    { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 70}px) scale(.55)`, opacity: .95, offset: .55 },
+    { transform: `translate(${dx}px, ${dy}px) scale(.1)`, opacity: .3, borderRadius: '50%' },
+  ], { duration: 750, easing: 'cubic-bezier(.5,0,.3,1)' });
+  anim.onfinish = () => { c.remove(); bump(); };
+}
+function changed() { saveCart(); renderCart(); renderGrid(); if (viewing) renderModal(); }
+function add(key, img) {
   const l = lineOf(key); if (!l) return;
   if (!canAdd(l.p, l.v)) { toast(t('noMore')); return; }
+  fly(img);
   cart[key] = (cart[key] || 0) + stepOf(l.p, l.v); changed();
   toast(`<b>${lineName(l)}</b> ${t('inCart')}`);
 }
-function openCart() { $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').hidden = false; }
+function openCart() { closeModal(); $('drawer').classList.add('open'); $('drawer').setAttribute('aria-hidden', 'false'); $('scrim').hidden = false; }
 function closeCart() { $('drawer').classList.remove('open'); $('drawer').setAttribute('aria-hidden', 'true'); $('scrim').hidden = true; }
 
-function renderAll() { applyTexts(); renderFilters(); renderGrid(); renderCart(); }
+async function share() {
+  try { if (navigator.share) { await navigator.share({ title: 'SquishAz', url: SITE }); return; } }
+  catch (e) { if (e && e.name === 'AbortError') return; }
+  try { await navigator.clipboard.writeText(SITE); toast(t('shared')); } catch (e) { toast(SITE); }
+}
+
+/* Счётчик в баннере */
+function countUp() {
+  if (reduced) return;
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const n = +el.dataset.count, t0 = performance.now();
+    const step = now => {
+      const k = Math.min(1, (now - t0) / 1000);
+      el.textContent = Math.round(n * (1 - Math.pow(1 - k, 3)));
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  });
+}
+
+function renderAll() { applyTexts(); renderFilters(); renderGrid(); renderCart(); if (viewing) renderModal(); }
 
 document.addEventListener('click', e => {
+  if (e.target === $('modal')) { closeModal(); return; }
   const tile = e.target.closest('[data-tile]');
-  if (tile) { filter = tile.dataset.tile; renderFilters(); renderGrid(); return; }
+  if (tile) { filter = tile.dataset.tile; renderFilters(); renderGrid(true); return; }
   if (e.target.closest('#sendWa') && (!form.name.trim() || !form.addr.trim())) {
     e.preventDefault(); $('sendErr').hidden = false; (form.name.trim() ? $('cAddr') : $('cName')).focus(); return;
   }
   const b = e.target.closest('button'); if (!b) return;
   if (b.dataset.lang) { lang = b.dataset.lang; store.set('squishaz-lang', lang); renderAll(); }
-  if (b.dataset.cat) { filter = b.dataset.cat; renderFilters(); renderGrid(); }
-  if (b.dataset.pick) { const [id, k] = b.dataset.pick.split(':'); picked[id] = k; renderGrid(); }
-  if (b.dataset.add) add(b.dataset.add);
+  if (b.dataset.cat) { filter = b.dataset.cat; renderFilters(); renderGrid(true); }
+  if (b.dataset.pick) { const [id, k] = b.dataset.pick.split(':'); picked[id] = k; renderGrid(); if (viewing) renderModal(); }
+  if (b.dataset.view) {
+    const img = b.querySelector('img');
+    if (!reduced) { img.classList.remove('squish'); void img.offsetWidth; img.classList.add('squish'); }
+    setTimeout(() => openModal(b.dataset.view), reduced ? 0 : 230);
+  }
+  if ('close' in b.dataset) closeModal();
+  if (b.dataset.add) add(b.dataset.add, b.closest('.card, .sheet, .up')?.querySelector('img'));
   if (b.dataset.inc) add(b.dataset.inc);
   if (b.dataset.dec) {
     const l = lineOf(b.dataset.dec);
     if (--cart[b.dataset.dec] < ((l && l.v.min) || 1)) delete cart[b.dataset.dec];
     changed();
   }
+  if ('share' in b.dataset) share();
   if (b.dataset.copy) {
     try { navigator.clipboard.writeText(b.dataset.copy).then(() => toast(t('copied')), () => toast(t('copyFail'))); }
     catch (err) { toast(t('copyFail')); }
   }
 });
 document.addEventListener('input', e => {
-  if (e.target.id === 'search') { query = e.target.value; renderGrid(); }
+  if (e.target.id === 'search') { query = e.target.value; renderGrid(true); }
   if (e.target.id === 'cName') form.name = e.target.value;
   if (e.target.id === 'cAddr') form.addr = e.target.value;
   if (e.target.id === 'cComment') form.comment = e.target.value;
@@ -816,9 +1080,15 @@ document.addEventListener('input', e => {
   }
 });
 $('openCart').onclick = openCart; $('closeCart').onclick = closeCart; $('scrim').onclick = closeCart;
-document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCart(); });
+$('cartbarBtn').onclick = openCart;
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Escape') return;
+  if (!$('modal').hidden) closeModal(); else closeCart();
+});
 
 renderAll();
+countUp();
 </script>
+
 
 </html>
