@@ -282,6 +282,7 @@ footer b { color: #fff; }
 }
 .toast b { color: var(--yellow); }
 .toast.show { transform: translate(-50%, 0); }
+.toast:not(.show) { opacity: 0; visibility: hidden; pointer-events: none; transition: transform .25s ease, opacity .2s ease, visibility 0s .25s; }
 
 /* На телефоне — по 3 товара в ряд, компактные карточки */
 @media (max-width: 600px) {
