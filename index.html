@@ -978,12 +978,16 @@ function route() {
   document.body.dataset.view = view;
   closeModal(); closeCart();
   if (view === 'catalog') {
-    if (was !== 'catalog') { window.scrollTo(0, 0); renderGrid(true); }
+    if (was !== 'catalog') { window.scrollTo({ top: 0, behavior: 'instant' }); renderGrid(true); }
     return;
   }
   const target = h && h !== '#top' ? document.querySelector(h) : null;
-  if (target) requestAnimationFrame(() => target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }));
-  else window.scrollTo(0, 0);
+  const go = () => {
+    if (!target) { window.scrollTo({ top: 0, behavior: 'instant' }); return; }
+    const y = target.getBoundingClientRect().top + window.scrollY - document.querySelector('header').offsetHeight - 8;
+    window.scrollTo({ top: Math.max(0, y), behavior: was === 'catalog' || reduced ? 'instant' : 'smooth' });
+  };
+  setTimeout(go, 30);
 }
 window.addEventListener('hashchange', route);
 
