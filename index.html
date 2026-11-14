@@ -768,7 +768,7 @@ const T = {
     'stock': n => `В наличии: ${n} шт`, 'stock.set': 'В наличии: 1 набор',
     'soldout': 'Всё уже в корзине', 'soldout.btn': 'Нет в наличии', 'noMore': 'Больше нет в наличии',
     'bar.items': ['Бесплатная доставка по Баку от 25 ₼', 'Привезём сегодня или завтра', 'Самовывоз бесплатно', 'Заказ в WhatsApp за минуту', 'Наборы и поштучно'],
-    'back': '← На главную', 'pop.title': 'Популярное', 'pop.lead': 'Игрушки, которые чаще всего смотрят. Остальное в каталоге.', 'pop.all': 'Весь каталог',
+    'back': '← На главную', 'pop.title': 'Все игрушки', 'pop.lead': 'Весь ассортимент магазина. Поиск и категории есть в каталоге.', 'pop.all': 'Поиск и категории',
     'del.p.label': 'Самовывоз', 'del.p.title': 'Бесплатно',
     'del.p.text': 'Можно забрать заказ самим. Адрес и время сообщим в WhatsApp: напишите нам, и договоримся.',
     'del.p.btn': 'Договориться в WhatsApp',
@@ -846,7 +846,7 @@ const T = {
     'stock': n => `Stokda: ${n} ədəd`, 'stock.set': 'Stokda: 1 dəst',
     'soldout': 'Hamısı artıq səbətdədir', 'soldout.btn': 'Stokda yoxdur', 'noMore': 'Stokda daha yoxdur',
     'bar.items': ['25 ₼-dan Bakı daxili pulsuz çatdırılma', 'Bu gün və ya sabah gətiririk', 'Özün götürmək pulsuzdur', 'Bir dəqiqəyə WhatsApp-da sifariş', 'Dəstlə və ya ədədlə'],
-    'back': '← Ana səhifə', 'pop.title': 'Populyar', 'pop.lead': 'Ən çox baxılan oyuncaqlar. Qalanları kataloqdadır.', 'pop.all': 'Bütün kataloq',
+    'back': '← Ana səhifə', 'pop.title': 'Bütün oyuncaqlar', 'pop.lead': 'Mağazanın bütün çeşidi. Axtarış və kateqoriyalar kataloqdadır.', 'pop.all': 'Axtarış və kateqoriyalar',
     'del.p.label': 'Özün götür', 'del.p.title': 'Pulsuz',
     'del.p.text': 'Sifarişi özünüz götürə bilərsiniz. Ünvanı və vaxtı WhatsApp-da bildirəcəyik: bizə yazın, razılaşaq.',
     'del.p.btn': 'WhatsApp-da razılaşın',
@@ -1078,10 +1078,11 @@ function renderGrid(animate) {
   const g = $('grid');
   g.innerHTML = list.length ? list.map(card).join('') : `<p class="nothing">${t('cat.nothing')}</p>`;
   if (animate && !reduced) { g.classList.remove('anim'); void g.offsetWidth; g.classList.add('anim'); }
-  $('popularGrid').innerHTML = ['dragon', 'web', 'grape', 'croc'].map(id => PRODUCTS.find(p => p.id === id)).map(card).join('');
+  $('popularGrid').innerHTML = PRODUCTS.map(card).join('');
 }
 
 /* Две страницы: главная и каталог (#catalog) */
+let fromTile = false;
 function route() {
   const h = location.hash;
   const view = h === '#catalog' ? 'catalog' : 'home';
@@ -1090,9 +1091,15 @@ function route() {
   closeModal(); closeCart();
   if (was && was !== view) replay(document.querySelector('main'), 'page-in');
   if (view === 'catalog') {
-    if (was !== 'catalog') { window.scrollTo({ top: 0, behavior: 'instant' }); renderGrid(true); }
+    if (was !== 'catalog') {
+      /* Через меню или кнопку — всегда весь каталог; через плитку — её категория */
+      if (!fromTile) { filter = 'all'; query = ''; $('search').value = ''; renderFilters(); }
+      window.scrollTo({ top: 0, behavior: 'instant' }); renderGrid(true);
+    }
+    fromTile = false;
     return;
   }
+  fromTile = false;
   const target = h && h !== '#top' ? document.querySelector(h) : null;
   const go = () => {
     if (!target) { window.scrollTo({ top: 0, behavior: 'instant' }); return; }
@@ -1306,7 +1313,7 @@ function renderAll() { applyTexts(); renderFilters(); renderGrid(); renderCart()
 document.addEventListener('click', e => {
   if (e.target === $('modal')) { closeModal(); return; }
   const tile = e.target.closest('[data-tile]');
-  if (tile) { filter = tile.dataset.tile; renderFilters(); renderGrid(true); return; }
+  if (tile) { filter = tile.dataset.tile; query = ''; $('search').value = ''; fromTile = document.body.dataset.view !== 'catalog'; renderFilters(); renderGrid(true); return; }
   if (e.target.closest('#sendWa') && !formOk()) {
     e.preventDefault(); $('sendErr').hidden = false; (form.name.trim() ? $('cAddr') : $('cName')).focus(); return;
   }
