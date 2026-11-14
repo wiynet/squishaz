@@ -111,7 +111,12 @@ header { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; backg
   min-width: 22px; height: 22px; padding: 0 6px; border-radius: 999px; background: #121412; color: var(--yellow);
   font-size: 12px; display: grid; place-items: center; font-variant-numeric: tabular-nums;
 }
-@media (max-width: 900px) { .nav-links { display: none; } }
+/* На телефоне меню — второй строкой шапки */
+@media (max-width: 900px) {
+  .nav { flex-wrap: wrap; row-gap: 4px; padding-block: 10px 8px; }
+  .nav-links { order: 3; width: 100%; justify-content: center; gap: 30px; font-size: 15px; padding-top: 2px; }
+  section { scroll-margin-top: 120px; }
+}
 @media (max-width: 460px) { .cart-label { display: none; } #openCart { padding: 10px 12px; } .logo { font-size: 21px; } }
 
 /* Hero */
@@ -199,6 +204,15 @@ section { padding-block: 48px; }
 .del-2 .label { color: var(--green); }
 .del-2 p { color: #c9cec8; }
 .del-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px; }
+.del-3 { background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.del-3 .label { color: var(--green); }
+.del-3 p { color: var(--ink-soft); }
+.method { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.method-title { font-size: 13px; font-weight: 600; color: var(--ink-soft); }
+.mbtn { border: 0; background: var(--surface); box-shadow: inset 0 0 0 1.5px var(--line); color: var(--ink-soft); border-radius: 12px; padding: 10px; font-weight: 700; font-size: 14px; display: grid; gap: 2px; text-align: center; }
+.mbtn small { font-weight: 600; font-size: 12px; opacity: .8; }
+.mbtn[aria-pressed="true"] { background: var(--chip-on-bg); color: var(--chip-on-fg); box-shadow: none; }
+.pickup-note { font-size: 13px; color: var(--ink); background: var(--tint-g); border-radius: 12px; padding: 10px 12px; }
 
 /* FAQ */
 .faq { display: grid; gap: 10px; max-width: 820px; }
@@ -268,6 +282,23 @@ footer b { color: #fff; }
 }
 .toast b { color: var(--yellow); }
 .toast.show { transform: translate(-50%, 0); }
+
+/* На телефоне — по 3 товара в ряд, компактные карточки */
+@media (max-width: 600px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .card { border-radius: 12px; }
+  .card:hover { transform: none; box-shadow: none; }
+  .card .body { padding: 8px 7px 9px; gap: 2px; }
+  .card .cat-label, .card .note { display: none; }
+  .card h3 { font-size: 12.5px; line-height: 1.25; }
+  .card .variant { gap: 4px; margin-top: 4px; }
+  .card .vbtn, .card .vtag { width: 100%; text-align: left; font-size: 10.5px; line-height: 1.25; padding: 4px 6px; border-radius: 8px; }
+  .card .stock { font-size: 10.5px; margin-top: 3px; }
+  .card .buy { flex-direction: column; align-items: stretch; gap: 6px; padding-top: 6px; }
+  .card .price { font-size: 15px; }
+  .card .buy .btn { padding: 7px 4px; font-size: 12px; border-radius: 9px; }
+  .card .badge { top: 6px; left: 6px; font-size: 10px; padding: 2px 7px; }
+}
 
 /* ---------- Анимации ---------- */
 .btn { position: relative; overflow: hidden; isolation: isolate; }
@@ -474,6 +505,14 @@ footer b { color: #fff; }
           <h3 data-i18n="del.c.title"></h3>
           <p data-i18n="del.c.text"></p>
         </div>
+        <div class="del del-3">
+          <span class="label" data-i18n="del.p.label"></span>
+          <h3 data-i18n="del.p.title"></h3>
+          <p data-i18n="del.p.text"></p>
+          <div class="del-actions">
+            <a class="btn green" id="pickupWa" target="_blank" rel="noopener"></a>
+          </div>
+        </div>
         <div class="del del-2" id="contacts">
           <span class="label">WhatsApp</span>
           <h3>+7 994 132 78 80</h3>
@@ -557,7 +596,8 @@ const T = {
     'wa.write': 'Написать в WhatsApp', 'wa.copy': 'Скопировать номер',
     'faq.title': 'Частые вопросы',
     'faq': [
-      ['Как сделать заказ?', 'Добавьте игрушки в корзину, укажите имя и адрес и нажмите «Отправить заказ в WhatsApp». Откроется чат с готовым сообщением. Можно и просто написать нам в WhatsApp.'],
+      ['Как сделать заказ?', 'Добавьте игрушки в корзину, выберите курьера или самовывоз и нажмите «Отправить заказ в WhatsApp». Откроется чат с готовым сообщением. Можно и просто написать нам в WhatsApp.'],
+      ['Можно забрать заказ самому?', 'Да, самовывоз бесплатный. Выберите «Самовывоз» в корзине или просто напишите нам в WhatsApp: сообщим адрес и договоримся о времени.'],
       ['Сколько стоит доставка?', 'Курьер по Баку стоит 3 ₼. Если заказ от 25 ₼, доставка бесплатная.'],
       ['Когда привезут заказ?', 'В тот же или на следующий день. Курьер позвонит за час до приезда.'],
       ['Доставляете за пределы Баку?', 'Сейчас доставляем только по Баку. Если вы в другом городе, напишите нам в WhatsApp.'],
@@ -574,7 +614,15 @@ const T = {
     'v.set': n => `Набор ${n} шт`, 'v.pc': 'поштучно', 'v.pcMin': n => `Поштучно от ${n} шт`, 'perPc': 'за шт',
     'stock': n => `В наличии: ${n} шт`, 'stock.set': 'В наличии: 1 набор',
     'soldout': 'Всё уже в корзине', 'soldout.btn': 'Нет в наличии', 'noMore': 'Больше нет в наличии',
-    'bar.items': ['Бесплатная доставка по Баку от 25 ₼', 'Привезём сегодня или завтра', 'Заказ в WhatsApp за минуту', 'Наборы и поштучно'],
+    'bar.items': ['Бесплатная доставка по Баку от 25 ₼', 'Привезём сегодня или завтра', 'Самовывоз бесплатно', 'Заказ в WhatsApp за минуту', 'Наборы и поштучно'],
+    'del.p.label': 'Самовывоз', 'del.p.title': 'Бесплатно',
+    'del.p.text': 'Можно забрать заказ самим. Адрес и время сообщим в WhatsApp: напишите нам, и договоримся.',
+    'del.p.btn': 'Договориться в WhatsApp',
+    'msg.pickupAsk': 'Здравствуйте! Хочу забрать заказ самовывозом. Подскажите адрес и когда можно подъехать?',
+    'm.title': 'Как получить заказ', 'm.courier': 'Курьер', 'm.pickup': 'Самовывоз',
+    'pickup.note': 'Адрес и время самовывоза сообщим в WhatsApp, когда ответим на заказ.',
+    'msg.method': 'Получение', 'msg.pickup': 'самовывоз, подскажите адрес и время',
+    'send.err.pick': 'Укажите имя, чтобы мы знали, кто заберёт заказ.',
     'bar.from': s => `Цены от ${s}`,
     'st1': n => `<b data-count="${n}">${n}</b><span>игрушек в каталоге</span>`,
     'st2': s => `<b>от ${s}</b><span>цены в каталоге</span>`,
@@ -582,8 +630,8 @@ const T = {
     'how.title': 'Как заказать', 'how.lead': 'Три шага, и игрушка уже едет к вам.',
     'how': [
       ['Выберите игрушки', 'Добавьте в корзину набор или нужное количество штук.'],
-      ['Отправьте заказ в WhatsApp', 'Укажите имя и адрес, сайт сам соберёт сообщение с заказом.'],
-      ['Получите курьером', 'Привезём по Баку сегодня или завтра. От 25 ₼ доставка бесплатная.'],
+      ['Отправьте заказ в WhatsApp', 'Укажите имя и способ получения, сайт сам соберёт сообщение с заказом.'],
+      ['Получите заказ', 'Курьер привезёт по Баку сегодня или завтра. Или заберите сами: адрес сообщим в WhatsApp.'],
     ],
     'more': 'Подробнее', 'close': 'Закрыть', 'ask': 'Спросить в WhatsApp', 'msg.ask': s => `Здравствуйте! Интересует: ${s}`,
     'up.pick': 'Добавьте что-нибудь до бесплатной доставки:',
@@ -625,7 +673,8 @@ const T = {
     'wa.write': 'WhatsApp-a yazın', 'wa.copy': 'Nömrəni kopyala',
     'faq.title': 'Tez-tez verilən suallar',
     'faq': [
-      ['Necə sifariş etmək olar?', 'Oyuncaqları səbətə əlavə edin, adınızı və ünvanınızı yazın və «Sifarişi WhatsApp-a göndər» düyməsini basın. Hazır mesajla söhbət açılacaq. Sadəcə WhatsApp-a yazmaq da olar.'],
+      ['Necə sifariş etmək olar?', 'Oyuncaqları səbətə əlavə edin, kuryer və ya «Özün götür» seçin və «Sifarişi WhatsApp-a göndər» düyməsini basın. Hazır mesajla söhbət açılacaq. Sadəcə WhatsApp-a yazmaq da olar.'],
+      ['Sifarişi özüm götürə bilərəm?', 'Bəli, özün götürmək pulsuzdur. Səbətdə «Özün götür» seçin və ya sadəcə WhatsApp-a yazın: ünvanı bildirəcək və vaxtı razılaşdıracağıq.'],
       ['Çatdırılma neçəyədir?', 'Bakı daxili kuryer 3 ₼-dır. Sifariş 25 ₼ və daha çox olarsa, çatdırılma pulsuzdur.'],
       ['Sifarişi nə vaxt gətirəcəksiniz?', 'Elə həmin gün və ya ertəsi gün. Kuryer gəlməzdən bir saat əvvəl zəng edəcək.'],
       ['Bakıdan kənara çatdırırsınız?', 'Hazırda yalnız Bakı daxilində çatdırırıq. Başqa şəhərdəsinizsə, WhatsApp-a yazın.'],
@@ -642,7 +691,15 @@ const T = {
     'v.set': n => `${n} ədədlik dəst`, 'v.pc': 'ədədlə', 'v.pcMin': n => `Ədədlə, ${n} ədəddən`, 'perPc': 'ədədi',
     'stock': n => `Stokda: ${n} ədəd`, 'stock.set': 'Stokda: 1 dəst',
     'soldout': 'Hamısı artıq səbətdədir', 'soldout.btn': 'Stokda yoxdur', 'noMore': 'Stokda daha yoxdur',
-    'bar.items': ['25 ₼-dan Bakı daxili pulsuz çatdırılma', 'Bu gün və ya sabah gətiririk', 'Bir dəqiqəyə WhatsApp-da sifariş', 'Dəstlə və ya ədədlə'],
+    'bar.items': ['25 ₼-dan Bakı daxili pulsuz çatdırılma', 'Bu gün və ya sabah gətiririk', 'Özün götürmək pulsuzdur', 'Bir dəqiqəyə WhatsApp-da sifariş', 'Dəstlə və ya ədədlə'],
+    'del.p.label': 'Özün götür', 'del.p.title': 'Pulsuz',
+    'del.p.text': 'Sifarişi özünüz götürə bilərsiniz. Ünvanı və vaxtı WhatsApp-da bildirəcəyik: bizə yazın, razılaşaq.',
+    'del.p.btn': 'WhatsApp-da razılaşın',
+    'msg.pickupAsk': 'Salam! Sifarişi özüm götürmək istəyirəm. Ünvanı və nə vaxt gələ biləcəyimi deyə bilərsiniz?',
+    'm.title': 'Sifarişi necə almaq istəyirsiniz', 'm.courier': 'Kuryer', 'm.pickup': 'Özün götür',
+    'pickup.note': 'Özün götürmə ünvanını və vaxtını sifarişə cavab verəndə WhatsApp-da bildirəcəyik.',
+    'msg.method': 'Alma üsulu', 'msg.pickup': 'özüm götürəcəyəm, ünvanı və vaxtı bildirin',
+    'send.err.pick': 'Sifarişi kimin götürəcəyini bilmək üçün adınızı yazın.',
     'bar.from': s => `Qiymətlər ${s}-dan`,
     'st1': n => `<b data-count="${n}">${n}</b><span>oyuncaq kataloqda</span>`,
     'st2': s => `<b>${s}-dan</b><span>kataloqda qiymətlər</span>`,
@@ -650,8 +707,8 @@ const T = {
     'how.title': 'Necə sifariş etmək olar', 'how.lead': 'Üç addım və oyuncaq artıq yoldadır.',
     'how': [
       ['Oyuncaqları seçin', 'Səbətə dəst və ya lazım olan sayda ədəd əlavə edin.'],
-      ['Sifarişi WhatsApp-a göndərin', 'Adınızı və ünvanınızı yazın, sayt sifariş mesajını özü hazırlayacaq.'],
-      ['Kuryerlə alın', 'Bakı daxilində bu gün və ya sabah gətiririk. 25 ₼-dan çatdırılma pulsuzdur.'],
+      ['Sifarişi WhatsApp-a göndərin', 'Adınızı yazın və alma üsulunu seçin, sayt sifariş mesajını özü hazırlayacaq.'],
+      ['Sifarişi alın', 'Kuryer Bakı daxilində bu gün və ya sabah gətirəcək. Ya da özünüz götürün: ünvanı WhatsApp-da bildirəcəyik.'],
     ],
     'more': 'Ətraflı', 'close': 'Bağla', 'ask': 'WhatsApp-da soruşun', 'msg.ask': s => `Salam! Maraqlanıram: ${s}`,
     'up.pick': 'Pulsuz çatdırılma üçün nəsə əlavə edin:',
@@ -757,7 +814,10 @@ const t = (k, ...a) => { const v = T[lang][k] ?? T.ru[k]; return typeof v === 'f
 let cart = {};
 try { cart = JSON.parse(store.get('squishaz-toys-cart') || '{}') || {}; } catch (e) { cart = {}; }
 const saveCart = () => store.set('squishaz-toys-cart', JSON.stringify(cart));
-let form = { name: '', addr: '', comment: '' };
+let form = { name: '', addr: '', comment: '', method: 'courier' };
+const isPickup = () => form.method === 'pickup';
+const shipOf = sub => isPickup() ? 0 : (sub >= FREE_FROM ? 0 : SHIP);
+const formOk = () => form.name.trim() && (isPickup() || form.addr.trim());
 let filter = 'all', query = '', giftAge = 6, giftBudget = 10;
 
 function waUrl(text) { return `https://wa.me/${PHONE}?text=${encodeURIComponent(text)}`; }
@@ -793,6 +853,8 @@ function applyTexts() {
   document.querySelectorAll('.wa-link').forEach(a => { a.href = waUrl(t('msg.hello')); });
   $('waFloat').innerHTML = ICONS.wa;
   document.querySelectorAll('.del-actions .wa-link').forEach(a => { a.innerHTML = ICONS.wa + t('wa.write'); });
+  $('pickupWa').href = waUrl(t('msg.pickupAsk'));
+  $('pickupWa').innerHTML = ICONS.wa + t('del.p.btn');
 
   $('showcase').innerHTML = [['p10.jpg', 'squish'], ['p12.jpg', 'prank'], ['p03.jpg', 'active'], ['p06.jpg', 'fun']]
     .map(([src, cat], i) => `<a class="tile" style="--i:${i}" href="#catalog" data-tile="${cat}"><img src="${src}" alt="${t('tile.' + cat)}"><span>${t('tile.' + cat)}</span></a>`).join('');
@@ -893,19 +955,19 @@ const lineName = ({ p, v }) => p.name[lang] + (v.k === 'set' ? ` (${vLabel(p, v)
 const inCart = id => Object.keys(cart).some(k => k.startsWith(id + ':'));
 
 function orderText() {
-  const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
+  const sub = subtotal(), ship = shipOf(sub);
   const lines = Object.entries(cart).map(([key, q]) => {
     const l = lineOf(key);
     return `• ${lineName(l)} × ${q} = ${azn(l.v.price * q)}`;
   });
   return [t('msg.hi'), ...lines, '',
     `${t('goods')}: ${azn(sub)}`,
-    `${t('courier')}: ${ship ? azn(ship) : t('free')}`,
+    isPickup() ? `${t('msg.method')}: ${t('msg.pickup')}` : `${t('courier')}: ${ship ? azn(ship) : t('free')}`,
     `${t('total')}: ${azn(sub + ship)}`, '',
     `${t('msg.name')}: ${form.name.trim()}`,
-    `${t('msg.addr')}: ${form.addr.trim()}`,
-    form.comment.trim() ? `${t('msg.comment')}: ${form.comment.trim()}` : ''
-  ].filter((l, i, arr) => !(l === '' && i === arr.length - 1)).join('\n');
+    isPickup() ? null : `${t('msg.addr')}: ${form.addr.trim()}`,
+    form.comment.trim() ? `${t('msg.comment')}: ${form.comment.trim()}` : null
+  ].filter(l => l !== null).join('\n');
 }
 function updateSendLink() {
   const a = $('sendWa'); if (a) a.href = waUrl(orderText());
@@ -950,10 +1012,10 @@ function renderCart() {
       <div class="qty"><button data-dec="${key}" aria-label="${t('minus')}">−</button><span>${q}</span><button data-inc="${key}" aria-label="${t('plus')}" ${more ? '' : 'disabled'}>+</button></div>
     </div>`;
   }).join('');
-  const sub = subtotal(), ship = sub >= FREE_FROM ? 0 : SHIP;
+  const sub = subtotal(), ship = shipOf(sub), pickup = isPickup();
   const pct = Math.min(100, Math.round(sub / FREE_FROM * 100));
   const need = FREE_FROM - sub;
-  const ideas = ship ? PRODUCTS.filter(p => !inCart(p.id)).map(p => ({ p, v: variants(p)[0] }))
+  const ideas = ship && !pickup ? PRODUCTS.filter(p => !inCart(p.id)).map(p => ({ p, v: variants(p)[0] }))
     .filter(x => canAdd(x.p, x.v)).sort((a, b) => Math.abs(a.v.price - need) - Math.abs(b.v.price - need)).slice(0, 3) : [];
   const upsell = ideas.length ? `<div class="upsell"><b>${t('up.pick')}</b>${ideas.map(({ p, v }) => `<div class="up">
       <img src="${p.img}" alt="">
@@ -963,23 +1025,29 @@ function renderCart() {
     </div>`).join('')}</div>` : '';
   $('checkoutBox').innerHTML = `${upsell}
     <div class="totals">
-      <div class="free-note">${ship ? t('left', azn(need)) : t('gotFree')}</div>
-      <div class="progress" aria-hidden="true"><i style="width:${lastPct}%"></i></div>
+      ${pickup ? '' : `<div class="free-note">${ship ? t('left', azn(need)) : t('gotFree')}</div>
+      <div class="progress" aria-hidden="true"><i style="width:${lastPct}%"></i></div>`}
       <div><span>${t('goods')}</span><span>${azn(sub)}</span></div>
-      <div><span>${t('courier')}</span><span>${ship ? azn(ship) : t('free')}</span></div>
+      <div><span>${pickup ? t('m.pickup') : t('courier')}</span><span>${ship ? azn(ship) : t('free')}</span></div>
       <div class="sum"><span>${t('total')}</span><span>${azn(sub + ship)}</span></div>
     </div>
     <div class="checkout">
+      <span class="method-title">${t('m.title')}</span>
+      <div class="method" role="group" aria-label="${t('m.title')}">
+        <button class="mbtn" data-method="courier" aria-pressed="${!pickup}">${t('m.courier')}<small>${sub >= FREE_FROM ? t('free') : azn(SHIP)}</small></button>
+        <button class="mbtn" data-method="pickup" aria-pressed="${pickup}">${t('m.pickup')}<small>${t('free')}</small></button>
+      </div>
       <label for="cName">${t('f.name')}<input id="cName" autocomplete="name" value=""></label>
-      <label for="cAddr">${t('f.addr')}<input id="cAddr" autocomplete="street-address" placeholder="${t('f.addr.ph')}"></label>
+      ${pickup ? `<p class="pickup-note">${t('pickup.note')}</p>`
+        : `<label for="cAddr">${t('f.addr')}<input id="cAddr" autocomplete="street-address" placeholder="${t('f.addr.ph')}"></label>`}
       <label for="cComment">${t('f.comment')}<input id="cComment" placeholder="${t('f.comment.ph')}"></label>
-      <div class="err" id="sendErr" hidden>${t('send.err')}</div>
+      <div class="err" id="sendErr" hidden>${t(pickup ? 'send.err.pick' : 'send.err')}</div>
       <a class="btn green" id="sendWa" target="_blank" rel="noopener">${ICONS.wa}${t('send')}</a>
       <p class="send-note">${t('send.note')}</p>
     </div>`;
   const bar = $('checkoutBox').querySelector('.progress i');
-  void bar.offsetWidth; bar.style.width = pct + '%'; lastPct = pct;
-  $('cName').value = form.name; $('cAddr').value = form.addr; $('cComment').value = form.comment;
+  if (bar) { void bar.offsetWidth; bar.style.width = pct + '%'; lastPct = pct; }
+  $('cName').value = form.name; if ($('cAddr')) $('cAddr').value = form.addr; $('cComment').value = form.comment;
   updateSendLink();
 }
 
@@ -1043,7 +1111,7 @@ document.addEventListener('click', e => {
   if (e.target === $('modal')) { closeModal(); return; }
   const tile = e.target.closest('[data-tile]');
   if (tile) { filter = tile.dataset.tile; renderFilters(); renderGrid(true); return; }
-  if (e.target.closest('#sendWa') && (!form.name.trim() || !form.addr.trim())) {
+  if (e.target.closest('#sendWa') && !formOk()) {
     e.preventDefault(); $('sendErr').hidden = false; (form.name.trim() ? $('cAddr') : $('cName')).focus(); return;
   }
   const b = e.target.closest('button'); if (!b) return;
@@ -1063,6 +1131,7 @@ document.addEventListener('click', e => {
     if (--cart[b.dataset.dec] < ((l && l.v.min) || 1)) delete cart[b.dataset.dec];
     changed();
   }
+  if (b.dataset.method) { form.method = b.dataset.method; renderCart(); }
   if ('share' in b.dataset) share();
   if (b.dataset.copy) {
     try { navigator.clipboard.writeText(b.dataset.copy).then(() => toast(t('copied')), () => toast(t('copyFail'))); }
@@ -1076,7 +1145,7 @@ document.addEventListener('input', e => {
   if (e.target.id === 'cComment') form.comment = e.target.value;
   if (['cName', 'cAddr', 'cComment'].includes(e.target.id)) {
     updateSendLink();
-    if (form.name.trim() && form.addr.trim()) $('sendErr').hidden = true;
+    if (formOk()) $('sendErr').hidden = true;
   }
 });
 $('openCart').onclick = openCart; $('closeCart').onclick = closeCart; $('scrim').onclick = closeCart;
